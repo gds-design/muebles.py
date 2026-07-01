@@ -396,10 +396,9 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Marca *</label>
+                <label className="font-bold text-slate-500 uppercase">Marca</label>
                 <input
                   type="text"
-                  required
                   value={formState.brand}
                   onChange={(e) => setFormState({ ...formState, brand: e.target.value })}
                   className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
@@ -407,10 +406,9 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Modelo *</label>
+                <label className="font-bold text-slate-500 uppercase">Modelo</label>
                 <input
                   type="text"
-                  required
                   value={formState.model}
                   onChange={(e) => setFormState({ ...formState, model: e.target.value })}
                   className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
@@ -418,10 +416,9 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">SKU *</label>
+                <label className="font-bold text-slate-500 uppercase">SKU</label>
                 <input
                   type="text"
-                  required
                   value={formState.sku}
                   onChange={(e) => setFormState({ ...formState, sku: e.target.value })}
                   className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"

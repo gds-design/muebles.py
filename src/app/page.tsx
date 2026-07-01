@@ -146,6 +146,10 @@ function HomeContent() {
       case "BookOpen": return <BookOpen className="w-5 h-5" />;
       case "Tv": return <Tv className="w-5 h-5" />;
       case "Plug": return <Plug className="w-5 h-5" />;
+      case "ShoppingCart": return <ShoppingCart className="w-5 h-5" />;
+      case "Star": return <Star className="w-5 h-5" />;
+      case "Heart": return <Heart className="w-5 h-5" />;
+      case "Clock": return <Clock className="w-5 h-5" />;
       default: return <Armchair className="w-5 h-5" />;
     }
   };

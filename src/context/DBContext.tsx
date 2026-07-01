@@ -125,6 +125,9 @@ interface DBContextType {
   editCoupon: (id: string, updatedCoupon: Partial<Coupon>) => void;
   deleteCoupon: (id: string) => void;
   useCoupon: (code: string) => Coupon | null;
+  addCategory: (category: Omit<Category, "id">) => void;
+  editCategory: (id: string, updatedCategory: Partial<Category>) => void;
+  deleteCategory: (id: string) => void;
 }
 
 const DBContext = createContext<DBContextType | undefined>(undefined);
@@ -513,7 +516,7 @@ const initialOrders: Order[] = [
 ];
 
 export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -521,6 +524,7 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   useEffect(() => {
     // Load from local storage or set seeds
+    const savedCategories = localStorage.getItem("muebles_categories");
     const savedProducts = localStorage.getItem("muebles_products");
     const savedOrders = localStorage.getItem("muebles_orders");
     const savedPromotions = localStorage.getItem("muebles_promotions");
@@ -643,6 +647,17 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       ];
       setCoupons(initialCoupons);
       localStorage.setItem("muebles_coupons", JSON.stringify(initialCoupons));
+    }
+
+    if (savedCategories && JSON.parse(savedCategories).length > 0) {
+      setTimeout(() => {
+        setCategories(JSON.parse(savedCategories));
+      }, 0);
+    } else {
+      setTimeout(() => {
+        setCategories(initialCategories);
+      }, 0);
+      localStorage.setItem("muebles_categories", JSON.stringify(initialCategories));
     }
   }, []);
 
@@ -844,6 +859,39 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return updated[idx];
   };
 
+  const addCategory = (c: Omit<Category, "id">) => {
+    setCategories((prev) => {
+      const newCategory: Category = {
+        ...c,
+        id: "cat-" + Date.now()
+      };
+      const updated = [...prev, newCategory];
+      localStorage.setItem("muebles_categories", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const editCategory = (id: string, updatedFields: Partial<Category>) => {
+    setCategories((prev) => {
+      const updated = prev.map((c) => {
+        if (c.id === id) {
+          return { ...c, ...updatedFields };
+        }
+        return c;
+      });
+      localStorage.setItem("muebles_categories", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      localStorage.setItem("muebles_categories", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <DBContext.Provider
       value={{
@@ -865,7 +913,10 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         addCoupon,
         editCoupon,
         deleteCoupon,
-        useCoupon
+        useCoupon,
+        addCategory,
+        editCategory,
+        deleteCategory
       }}
     >
       {children}

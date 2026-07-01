@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { LayoutDashboard, ShoppingCart, Armchair, Megaphone, Languages, Home, Menu, X, User, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Armchair, Megaphone, Languages, Home, Menu, X, User, BarChart3, Tag } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -44,6 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Análise de Produtos", href: "/admin/analysis", icon: <BarChart3 className="w-5 h-5" /> },
     { label: "Pedidos", href: "/admin/orders", icon: <ShoppingCart className="w-5 h-5" /> },
     { label: "Produtos", href: "/admin/products", icon: <Armchair className="w-5 h-5" /> },
+    { label: "Categorias", href: "/admin/categories", icon: <Tag className="w-5 h-5" /> },
     { label: "Leads Capturados", href: "/admin/leads", icon: <User className="w-5 h-5" /> },
     { label: "Central de Marketing", href: "/admin/marketing", icon: <Megaphone className="w-5 h-5" /> },
     { label: "Traduções", href: "/admin/translations", icon: <Languages className="w-5 h-5" /> }
