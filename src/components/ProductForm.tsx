@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useDB, Product } from "@/context/DBContext";
 import { parseVideoUrl, isValidVideoUrl, ProductVideo } from "@/lib/videoUtils";
-import { ArrowLeft, Save, Sparkles, AlertTriangle, Upload, Move, Check, Play, Film, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, AlertTriangle, Upload, Move, Check, Play, Film, Trash2, Crop } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ImageEditorModal from "./ImageEditorModal";
 
 interface ProductFormProps {
   isEditing?: boolean;
@@ -19,6 +20,12 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Image Editor States
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorImageSrc, setEditorImageSrc] = useState("");
+  const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null);
+  const [uploadQueue, setUploadQueue] = useState<string[]>([]);
 
   // Form State
   const [formState, setFormState] = useState({
@@ -175,7 +182,7 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
     });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files);
 
@@ -185,19 +192,52 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
     }
 
     setUploading(true);
-    try {
-      const processed: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const isMain = uploadedImages.length === 0 && i === 0;
-        const result = await compressAndConvertToWebP(file, isMain);
-        processed.push(result);
+    const readers: Promise<string>[] = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.onerror = () => reject(new Error("Erro ao ler o arquivo."));
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers)
+      .then((base64Strings) => {
+        setUploadQueue(base64Strings);
+        setEditorImageSrc(base64Strings[0]);
+        setEditingImageIndex(null);
+        setEditorOpen(true);
+      })
+      .catch((err) => {
+        alert("Erro no upload das imagens: " + err.message);
+      })
+      .finally(() => {
+        setUploading(false);
+      });
+  };
+
+  const handleEditExistingImage = (index: number) => {
+    setEditingImageIndex(index);
+    setEditorImageSrc(uploadedImages[index]);
+    setEditorOpen(true);
+  };
+
+  const handleEditorSave = (editedBase64: string) => {
+    if (editingImageIndex !== null) {
+      const updated = [...uploadedImages];
+      updated[editingImageIndex] = editedBase64;
+      setUploadedImages(updated);
+      setEditorOpen(false);
+      setEditingImageIndex(null);
+    } else {
+      setUploadedImages((prev) => [...prev, editedBase64]);
+      const nextQueue = uploadQueue.slice(1);
+      setUploadQueue(nextQueue);
+      if (nextQueue.length > 0) {
+        setEditorImageSrc(nextQueue[0]);
+      } else {
+        setEditorOpen(false);
       }
-      setUploadedImages((prev) => [...prev, ...processed]);
-    } catch (err: any) {
-      alert("Erro no processamento das imagens: " + err.message);
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -630,6 +670,15 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleEditExistingImage(index)}
+                              className="p-1 text-[10px] text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-400 rounded bg-white font-bold transition-all cursor-pointer flex items-center gap-1"
+                              title="Editar Imagem"
+                            >
+                              <Crop className="w-3 h-3" />
+                              <span>Editar</span>
+                            </button>
                             {!isMain && (
                               <button
                                 type="button"
@@ -1023,6 +1072,13 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
           <span>Salvar Alterações</span>
         </button>
       </div>
+
+      <ImageEditorModal
+        isOpen={editorOpen}
+        imageSrc={editorImageSrc}
+        onSave={handleEditorSave}
+        onClose={() => setEditorOpen(false)}
+      />
     </form>
   );
 }
