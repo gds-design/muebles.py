@@ -32,10 +32,10 @@ const getCtaLabel = (text: string, lang: "pt" | "es") => {
 };
 
 export default function MarketingCenter() {
-  const { products, coupons, addCoupon, editCoupon, deleteCoupon, orders } = useDB();
+  const { products, coupons, addCoupon, editCoupon, deleteCoupon, orders, promotions, updatePromotion } = useDB();
   const { locale } = useTranslation();
 
-  const [activeTab, setActiveTab] = useState<"canvas" | "ai" | "schedule" | "coupons">("canvas");
+  const [activeTab, setActiveTab] = useState<"canvas" | "ai" | "schedule" | "coupons" | "banners">("canvas");
   const [artLanguage, setArtLanguage] = useState<"pt" | "es">("pt");
 
   // Sync art language on mount/locale changes
@@ -91,6 +91,74 @@ export default function MarketingCenter() {
     expires_at: ""
   });
   const [editingCouponId, setEditingCouponId] = useState<string | null>(null);
+
+  // Banners Form State
+  const [editingPromoId, setEditingPromoId] = useState<string | null>(null);
+  const [promoForm, setPromoForm] = useState({
+    title_pt: "",
+    title_es: "",
+    subtitle_pt: "",
+    subtitle_es: "",
+    image_url: "",
+    image_url_es: "",
+    link_url: "",
+    active: true
+  });
+
+  const handleBannerImageUpload = (e: React.ChangeEvent<HTMLInputElement>, lang: "pt" | "es") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const maxWidth = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL("image/webp", 0.85);
+        if (lang === "pt") {
+          setPromoForm((prev) => ({ ...prev, image_url: dataUrl }));
+        } else {
+          setPromoForm((prev) => ({ ...prev, image_url_es: dataUrl }));
+        }
+      };
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePromoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPromoId) return;
+
+    updatePromotion(editingPromoId, {
+      title_pt: promoForm.title_pt,
+      title_es: promoForm.title_es,
+      subtitle_pt: promoForm.subtitle_pt || undefined,
+      subtitle_es: promoForm.subtitle_es || undefined,
+      image_url: promoForm.image_url,
+      image_url_es: promoForm.image_url_es || undefined,
+      link_url: promoForm.link_url,
+      active: promoForm.active
+    });
+
+    setEditingPromoId(null);
+    alert("Banner atualizado com sucesso!");
+  };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
@@ -1015,6 +1083,17 @@ export default function MarketingCenter() {
           <Ticket className="w-4 h-4" />
           <span>Cupons de Desconto</span>
         </button>
+        <button
+          onClick={() => setActiveTab("banners")}
+          className={`flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+            activeTab === "banners"
+              ? "bg-amber-500 text-slate-950 border-transparent font-black"
+              : "border-slate-200 text-slate-655 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <Image className="w-4 h-4" />
+          <span>Banners da Loja</span>
+        </button>
       </div>
 
       {/* Canvas Generator Tab */}
@@ -1773,6 +1852,242 @@ export default function MarketingCenter() {
             </div>
           </div>
           
+        </div>
+      )}
+
+      {/* Banners Manager Tab */}
+      {activeTab === "banners" && (
+        <div className="space-y-6 animate-fade-in text-xs font-bold">
+          <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Banners e Destaques da Loja</h2>
+                <p className="text-xs text-slate-500 font-medium">Gerencie os banners principais (PT/ES) exibidos no site</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+              {promotions.map((p) => (
+                <div key={p.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="bg-amber-500 text-slate-950 px-2 py-0.5 rounded text-[9px] uppercase font-black">
+                        {p.type === "hero" ? "Banner Principal (Hero)" : p.type === "primary_banner" ? "Banner Secundário (Meio)" : "Banner Terciário (Rodapé)"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[9px] uppercase font-black ${p.active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                        {p.active ? "Ativo" : "Inativo"}
+                      </span>
+                    </div>
+
+                    <div className="border border-slate-200 rounded-lg overflow-hidden bg-white aspect-video relative flex items-center justify-center">
+                      {p.image_url ? (
+                        <img src={p.image_url} alt={p.title_pt} className="max-h-full max-w-full object-contain" />
+                      ) : (
+                        <span className="text-slate-400">Sem imagem PT</span>
+                      )}
+                      <div className="absolute bottom-2 left-2 bg-slate-900/80 text-white px-1.5 py-0.5 rounded text-[8px]">PT (Português)</div>
+                    </div>
+
+                    <div className="border border-slate-200 rounded-lg overflow-hidden bg-white aspect-video relative flex items-center justify-center">
+                      {p.image_url_es || p.image_url ? (
+                        <img src={p.image_url_es || p.image_url} alt={p.title_es} className="max-h-full max-w-full object-contain" />
+                      ) : (
+                        <span className="text-slate-400">Sem imagem ES</span>
+                      )}
+                      <div className="absolute bottom-2 left-2 bg-slate-900/80 text-white px-1.5 py-0.5 rounded text-[8px]">ES (Español)</div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="text-slate-900 text-xs font-black truncate">{p.title_pt || "Sem título"}</h4>
+                      <p className="text-slate-500 text-[10px] truncate">{p.subtitle_pt || "Sem subtítulo"}</p>
+                    </div>
+
+                    <div className="space-y-1 border-t pt-2 border-slate-200">
+                      <h4 className="text-slate-800 text-xs font-black truncate">{p.title_es || "Sin título"}</h4>
+                      <p className="text-slate-400 text-[10px] truncate">{p.subtitle_es || "Sin subtítulo"}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingPromoId(p.id);
+                      setPromoForm({
+                        title_pt: p.title_pt,
+                        title_es: p.title_es,
+                        subtitle_pt: p.subtitle_pt || "",
+                        subtitle_es: p.subtitle_es || "",
+                        image_url: p.image_url,
+                        image_url_es: p.image_url_es || "",
+                        link_url: p.link_url || "",
+                        active: p.active
+                      });
+                      setTimeout(() => {
+                        document.getElementById("promo-editor-form")?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
+                    }}
+                    className="w-full py-2.5 bg-slate-950 text-white hover:bg-slate-900 text-center font-bold text-xs rounded-lg transition-colors cursor-pointer border-0"
+                  >
+                    Editar Banner
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {editingPromoId && (
+            <div id="promo-editor-form" className="bg-white border border-slate-100 p-6 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.03)] space-y-4">
+              <h2 className="text-sm font-black uppercase text-slate-900 border-b border-slate-100 pb-2 flex justify-between items-center">
+                <span>Editar Banner selecionado</span>
+                <button
+                  type="button"
+                  onClick={() => setEditingPromoId(null)}
+                  className="text-xs text-red-500 hover:underline uppercase bg-transparent border-none cursor-pointer"
+                >
+                  Fechar Editor
+                </button>
+              </h2>
+
+              <form onSubmit={handlePromoSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Título (Português) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={promoForm.title_pt}
+                      onChange={(e) => setPromoForm({ ...promoForm, title_pt: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Título (Español) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={promoForm.title_es}
+                      onChange={(e) => setPromoForm({ ...promoForm, title_es: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Subtítulo (Português)</label>
+                    <textarea
+                      value={promoForm.subtitle_pt}
+                      onChange={(e) => setPromoForm({ ...promoForm, subtitle_pt: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Subtítulo (Español)</label>
+                    <textarea
+                      value={promoForm.subtitle_es}
+                      onChange={(e) => setPromoForm({ ...promoForm, subtitle_es: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Link de Destino (Ex: #produtos ou /category/...)</label>
+                    <input
+                      type="text"
+                      value={promoForm.link_url}
+                      onChange={(e) => setPromoForm({ ...promoForm, link_url: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Status do Banner</label>
+                    <div className="flex items-center gap-2 pt-2.5">
+                      <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-[11px] text-slate-700 hover:text-slate-900">
+                        <input
+                          type="checkbox"
+                          checked={promoForm.active}
+                          onChange={(e) => setPromoForm({ ...promoForm, active: e.target.checked })}
+                          className="w-4 h-4 text-slate-900 accent-slate-950 border-2 border-slate-950 rounded focus:ring-0 cursor-pointer"
+                        />
+                        <span>Banner Ativo e Visível no Site</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                  {/* PT Banner Image Upload */}
+                  <div className="space-y-2 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Imagem do Banner (PT) *</label>
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="text"
+                        required
+                        value={promoForm.image_url}
+                        onChange={(e) => setPromoForm({ ...promoForm, image_url: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded focus:outline-none focus:border-amber-500 text-[10px] font-mono"
+                        placeholder="Link da imagem ou faça o upload abaixo"
+                      />
+                      <label className="border border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer hover:bg-slate-50 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleBannerImageUpload(e, "pt")}
+                          className="hidden"
+                        />
+                        <span className="text-[10px] font-bold text-slate-600">Fazer Upload de Imagem (PT)</span>
+                        <span className="text-[8px] text-slate-400">Conversão automática para WebP</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* ES Banner Image Upload */}
+                  <div className="space-y-2 font-bold text-slate-800 text-xs">
+                    <label className="text-slate-500 uppercase">Imagem do Banner (ES) - Opcional</label>
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="text"
+                        value={promoForm.image_url_es}
+                        onChange={(e) => setPromoForm({ ...promoForm, image_url_es: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded focus:outline-none focus:border-amber-500 text-[10px] font-mono"
+                        placeholder="Link da imagem ou faça o upload abaixo (se vazio, usa a imagem PT)"
+                      />
+                      <label className="border border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer hover:bg-slate-50 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleBannerImageUpload(e, "es")}
+                          className="hidden"
+                        />
+                        <span className="text-[10px] font-bold text-slate-600">Fazer Upload de Imagem (ES)</span>
+                        <span className="text-[8px] text-slate-400">Conversão automática para WebP</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPromoId(null)}
+                    className="px-5 py-2.5 border-2 border-slate-950 hover:bg-slate-50 rounded-xl font-bold cursor-pointer transition-colors uppercase tracking-wider text-xs"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-xl font-bold border-2 border-slate-950 shadow-[3px_3px_0px_rgba(0,0,0,1)] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all uppercase tracking-wider text-xs"
+                  >
+                    Salvar Alterações
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       )}
 

@@ -75,6 +75,7 @@ export interface Promotion {
   subtitle_pt?: string;
   subtitle_es?: string;
   image_url: string;
+  image_url_es?: string;
   link_url: string;
   active: boolean;
 }
@@ -431,8 +432,9 @@ const initialPromotions: Promotion[] = [
     title_pt: "Seu novo móvel sem complicação.",
     title_es: "Tu nuevo mueble sin complicaciones.",
     subtitle_pt: "Móveis e cadeiras para casa e escritório com uma experiência de compra simples e transparente.",
-    subtitle_es: "Muebles y sillas para el hogar y la oficina con una experiencia de compra simple y transparente.",
+    subtitle_es: "Muebles y sillas para el hogar y la oficina con uma experiencia de compra simple y transparente.",
     image_url: "/hero-furniture.jpg",
+    image_url_es: "/hero-furniture.jpg",
     link_url: "#produtos",
     active: true
   },
@@ -444,6 +446,7 @@ const initialPromotions: Promotion[] = [
     subtitle_pt: "Até 25% OFF em cadeiras com certificação de postura",
     subtitle_es: "Hasta 25% OFF en sillas con certificación de postura",
     image_url: "/banner-office.jpg",
+    image_url_es: "/banner-office.jpg",
     link_url: "/category/office-chairs",
     active: true
   },
@@ -455,6 +458,7 @@ const initialPromotions: Promotion[] = [
     subtitle_pt: "Para compras acima de 2.000.000 Gs.",
     subtitle_es: "Para compras superiores a 2.000.000 Gs.",
     image_url: "/banner-delivery.jpg",
+    image_url_es: "/banner-delivery.jpg",
     link_url: "#como-funciona",
     active: true
   }

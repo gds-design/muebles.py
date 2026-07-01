@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import { LeadPopup } from "@/components/LeadPopup";
-import { Armchair, Gamepad2, Table, Laptop, BookOpen, Percent, ChevronDown, Check, ArrowRight, MessageSquare, ShoppingCart, Star, Heart, FileText, Tv, Plug, Clock, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Armchair, Gamepad2, Table, Laptop, BookOpen, Percent, ChevronDown, Check, ArrowRight, MessageSquare, ShoppingCart, Star, Heart, FileText, Tv, Plug, Clock, SlidersHorizontal, ArrowUpDown, Truck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -253,90 +253,144 @@ function HomeContent() {
       <Header />
       <CartDrawer />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-slate-950 text-white py-20 sm:py-32 font-sans">
-        {/* Abstract Background pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
-        <div className="absolute -left-40 -top-40 w-96 h-96 rounded-full bg-slate-900 filter blur-3xl opacity-50" />
-        <div className="absolute right-0 bottom-0 w-120 h-120 rounded-full bg-slate-800/40 filter blur-3xl opacity-30" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Text Content */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-8 animate-slide-up text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-850 border border-slate-800 text-xs font-semibold tracking-wide text-accent-amber">
-              <span className="w-2 h-2 rounded-full bg-accent-amber animate-pulse" />
-              {locale === "pt" ? "Coleção Escritório & Casa 2026" : "Colección Oficina & Hogar 2026"}
-            </div>
+      {/* Top Highlights Info Bar (Above Hero) */}
+      <section className="bg-slate-50 border-b border-slate-200 py-4 sm:py-5 font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              {t("hero.title")}
-            </h1>
-            
-            <p className="text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed">
-              {t("hero.subtitle")}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="#produtos"
-                className="px-8 py-3.5 bg-accent-amber hover:bg-amber-600 text-slate-900 rounded-md font-bold text-center transition-all shadow-lg hover:shadow-accent-amber/20 flex items-center justify-center gap-2"
-              >
-                <span>{t("hero.cta_products")}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="https://wa.me/595981123456"
-                target="_blank"
-                rel="noreferrer"
-                className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-md font-semibold text-center border border-slate-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <MessageSquare className="w-4.5 h-4.5 text-green-500 fill-green-500" />
-                <span>{t("hero.cta_whatsapp")}</span>
-              </a>
-            </div>
-
-            {/* Micro Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-6 sm:pt-10 border-t border-slate-900 max-w-md">
-              <div>
-                <p className="text-2xl font-bold text-white font-mono">100%</p>
-                <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Transparente" : "Transparente"}</p>
+            {/* Card 1: Frete Grátis */}
+            <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-305">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <Truck className="w-5 h-5" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-white font-mono">24/48h</p>
-                <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Envio Rápido" : "Envío Rápido"}</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white font-mono">Online</p>
-                <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Suporte Online" : "Soporte Online"}</p>
+              <div className="min-w-0">
+                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 leading-tight">
+                  {locale === "pt" ? "Frete Grátis Especial" : "Envío Gratis Especial"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  {locale === "pt" ? "Para Cidade do Leste e Minga Guazú" : "Para Ciudad del Este y Minga Guazú"}
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* Graphic mockup / preview to make layout look premium */}
-          <div className="lg:col-span-5 hidden lg:flex justify-end animate-fade-in">
-            <div className="w-full max-w-sm rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 p-8 border border-slate-850 shadow-2xl relative group">
-              <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-accent-amber/10 flex items-center justify-center text-accent-amber">
-                <Star className="w-5 h-5 fill-accent-amber" />
+            {/* Card 2: Envio Rápido */}
+            <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-305">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <Clock className="w-5 h-5 animate-pulse" />
               </div>
-              {/* Product isometric schema design */}
-              <div className="h-64 flex items-center justify-center mb-6 relative overflow-hidden bg-slate-950/40 rounded-lg p-4">
-                <img
-                  src={placeholderSVGChairs("#f59e0b")}
-                  alt="Premium Chair"
-                  className="h-full object-contain transform group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-1">Executive Pro Chair</h3>
-              <p className="text-xs text-slate-500 mb-4">Design Ergonômico de Alta Costura</p>
-              <div className="flex items-center justify-between">
-                <span className="text-accent-amber font-bold text-xl font-mono">Gs. 1.590.000</span>
-                <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-medium">Lançamento</span>
+              <div className="min-w-0">
+                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 leading-tight">
+                  {locale === "pt" ? "Envio Rápido 24h/48h" : "Envío Rápido 24h/48h"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  {locale === "pt" ? "Entrega programada para todo o Paraguai" : "Entrega programada para todo Paraguay"}
+                </p>
               </div>
             </div>
+
+            {/* Card 3: Ofertas Relâmpago */}
+            <Link href="#produtos" className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-305 hover:border-amber-500 cursor-pointer">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <Percent className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-905 leading-tight">
+                  {locale === "pt" ? "Ofertas Relâmpago" : "Ofertas Relámpago"}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5 font-bold text-red-500">
+                  {locale === "pt" ? "Preços imperdíveis ativos hoje" : "Precios imperdibles activos hoy"}
+                </p>
+              </div>
+            </Link>
+
           </div>
         </div>
       </section>
+
+      {/* Hero Section */}
+      {(() => {
+        const heroPromo = promotions?.find(p => p.type === "hero" && p.active);
+        const heroTitle = heroPromo ? (locale === "pt" ? heroPromo.title_pt : heroPromo.title_es) : t("hero.title");
+        const heroSubtitle = heroPromo ? (locale === "pt" ? heroPromo.subtitle_pt : heroPromo.subtitle_es) : t("hero.subtitle");
+        const heroImage = heroPromo ? (locale === "pt" ? heroPromo.image_url : (heroPromo.image_url_es || heroPromo.image_url)) : "/hero-furniture.jpg";
+        const linkUrl = heroPromo?.link_url || "#produtos";
+        
+        return (
+          <section className="relative overflow-hidden bg-slate-950 text-white py-20 sm:py-28 font-sans">
+            {/* Abstract Background pattern */}
+            <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
+            <div className="absolute -left-40 -top-40 w-96 h-96 rounded-full bg-slate-900 filter blur-3xl opacity-50" />
+            <div className="absolute right-0 bottom-0 w-120 h-120 rounded-full bg-slate-800/40 filter blur-3xl opacity-30" />
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Text Content */}
+              <div className="lg:col-span-7 space-y-6 sm:space-y-8 animate-slide-up text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-850 border border-slate-800 text-xs font-semibold tracking-wide text-accent-amber">
+                  <span className="w-2 h-2 rounded-full bg-accent-amber animate-pulse" />
+                  {locale === "pt" ? "Destaques em Móveis & Tecnologia" : "Destacados en Muebles & Tecnología"}
+                </div>
+                
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                  {heroTitle}
+                </h1>
+                
+                <p className="text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed">
+                  {heroSubtitle}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href={linkUrl}
+                    className="px-8 py-3.5 bg-accent-amber hover:bg-amber-600 text-slate-900 rounded-md font-bold text-center transition-all shadow-lg hover:shadow-accent-amber/20 flex items-center justify-center gap-2"
+                  >
+                    <span>{t("hero.cta_products")}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <a
+                    href="https://wa.me/595981123456"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-md font-semibold text-center border border-slate-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="w-4.5 h-4.5 text-green-500 fill-green-500" />
+                    <span>{t("hero.cta_whatsapp")}</span>
+                  </a>
+                </div>
+
+                {/* Micro Stats */}
+                <div className="grid grid-cols-3 gap-6 pt-6 sm:pt-10 border-t border-slate-900 max-w-md">
+                  <div>
+                    <p className="text-2xl font-bold text-white font-mono">100%</p>
+                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Garantido" : "Garantizado"}</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-white font-mono">24/48h</p>
+                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Envio Rápido" : "Envío Rápido"}</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-white font-mono">Premium</p>
+                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Alto Padrão" : "Alto Nivel"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Graphic mockup with dynamic banner image */}
+              <div className="lg:col-span-5 hidden lg:flex justify-end animate-fade-in">
+                <div className="w-full max-w-md rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 p-4 border border-slate-850 shadow-2xl relative group">
+                  <div className="h-72 flex items-center justify-center overflow-hidden bg-slate-950/40 rounded-xl relative">
+                    <img
+                      src={heroImage}
+                      alt={heroTitle}
+                      className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500 rounded-lg"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Category Tabs */}
       <section className="py-8 bg-white border-b border-slate-100 font-sans sticky top-[72px] sm:top-[80px] z-30 shadow-sm/50">
