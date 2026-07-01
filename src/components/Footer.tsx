@@ -2,13 +2,33 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "@/context/LanguageContext";
-import { Phone, Mail, Shield, CheckCircle, Send, Heart } from "lucide-react";
+import { Phone, Mail, Shield, CheckCircle, Send, Heart, ArrowUp } from "lucide-react";
 import Link from "next/link";
 
 export const Footer: React.FC = () => {
   const { t, locale } = useTranslation();
   const [emailInput, setEmailInput] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +147,16 @@ export const Footer: React.FC = () => {
           
         </div>
       </div>
+      {/* Floating Scroll To Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3 bg-slate-900 text-white rounded-full border-2 border-slate-950 shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:bg-slate-800 hover:scale-110 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
+          title={locale === "pt" ? "Voltar ao Topo" : "Volver al Inicio"}
+        >
+          <ArrowUp className="w-5 h-5 text-accent-amber group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+      )}
     </footer>
   );
 };
