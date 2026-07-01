@@ -547,152 +547,152 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-              Promoções e Selos
-            </h3>
-            
-            <div className="space-y-3">
-              <label className="font-bold text-slate-500 uppercase block mb-1">Selecionar Selos do Produto</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {[
-                  { id: "promo", label: "🏷️ Oferta" },
-                  { id: "featured", label: "⭐ Destaque" },
-                  { id: "bestseller", label: "🔥 Mais Vendido" },
-                  { id: "free_shipping", label: "🚚 Frete Grátis" },
-                  { id: "new", label: "✨ Novo" },
-                  { id: "last_units", label: "⚠️ Últimas Unidades" }
-                ].map((badge) => {
-                  const isChecked = formState.badges.includes(badge.id);
-                  return (
-                    <button
-                      key={badge.id}
-                      type="button"
-                      onClick={() => handleBadgeToggle(badge.id)}
-                      className={`flex items-center gap-2 px-3 py-2.5 border-2 rounded-lg font-bold text-left cursor-pointer transition-all ${
-                        isChecked
-                          ? "bg-slate-950 text-white border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)] font-bold"
-                          : "bg-white text-slate-700 border-slate-200 hover:border-slate-400 font-bold"
-                      }`}
-                    >
-                      <span className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center flex-shrink-0 text-[10px] ${isChecked ? "bg-accent-amber border-slate-950 text-slate-950 font-bold" : "bg-white border-slate-300 font-bold"}`}>
-                        {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                      </span>
-                      <span>{badge.label}</span>
-                    </button>
-                  );
-                })}
+          {/* Especificações & Vídeo (Moved to Left Column) */}
+          <div className="space-y-4 pt-2">
+              <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
+                Especificações & Vídeo
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Dimensões *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.dimensions}
+                    onChange={(e) => setFormState({ ...formState, dimensions: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Material (PT) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.material_pt}
+                    onChange={(e) => setFormState({ ...formState, material_pt: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-1.5">
-              <label className="font-bold text-slate-500 uppercase">Data Limite da Oferta Relâmpago (Countdown)</label>
-              <input
-                type="datetime-local"
-                value={formState.countdown_end}
-                onChange={(e) => setFormState({ ...formState, countdown_end: e.target.value })}
-                className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-              />
-              <p className="text-[10px] text-slate-400">Ativa o cronômetro regressivo na página inicial do site para este produto.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-5 space-y-6">
-          <div className="space-y-4">
-            <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-              Fotos do Produto (Máximo 7)
-            </h3>
-
-            <div className="space-y-3">
-              <label className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-center cursor-pointer transition-all hover:bg-slate-50/60 ${uploading ? "opacity-60 pointer-events-none" : "border-slate-300 hover:border-slate-400"}`}>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-                <Upload className="w-8 h-8 text-slate-400" />
-                <div className="font-bold text-slate-800">
-                  {uploading ? "Compactando e convertendo..." : "Clique ou Arraste fotos aqui"}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Garantia (PT) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.warranty_pt}
+                    onChange={(e) => setFormState({ ...formState, warranty_pt: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
                 </div>
-                <div className="text-[10px] text-slate-400 leading-normal">
-                  Conversão automática para WebP.<br />
-                  Max: Principal 500 KB / Galeria 300 KB.<br />
-                  Formatos aceitos: JPG, PNG, WEBP, SVG.
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Prazo Entrega (PT) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.delivery_time_pt}
+                    onChange={(e) => setFormState({ ...formState, delivery_time_pt: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
                 </div>
-              </label>
+              </div>
 
-              {uploadedImages.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                    Galeria ({uploadedImages.length} de 7) — Arraste para reordenar
-                  </div>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {uploadedImages.map((img, index) => {
-                      const isMain = index === 0;
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Material (ES) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.material_es}
+                    onChange={(e) => setFormState({ ...formState, material_es: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-500 uppercase">Garantia (ES) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.warranty_es}
+                    onChange={(e) => setFormState({ ...formState, warranty_es: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 border-2 border-slate-950 p-4 rounded bg-slate-50/30">
+                <div className="flex items-center gap-2 border-b-2 border-slate-950 pb-2">
+                  <Film className="w-5 h-5 text-slate-950" />
+                  <h3 className="font-black text-sm uppercase text-slate-950">Vídeos do Produto (Máximo 3)</h3>
+                </div>
+
+                {formState.videos.length > 0 ? (
+                  <div className="space-y-3">
+                    {formState.videos.map((vid) => {
+                      const parsed = parseVideoUrl(vid.url);
                       return (
                         <div
-                          key={index}
-                          draggable
-                          onDragStart={() => handleDragStart(index)}
-                          onDragOver={(e) => handleDragOver(e, index)}
-                          onDrop={() => handleDrop(index)}
-                          className={`flex items-center gap-3 p-2 bg-slate-50 border-2 rounded-lg transition-all ${
-                            isMain
-                              ? "border-slate-950 shadow-[2px_2px_0px_rgba(0,0,0,1)] bg-amber-50/45"
-                              : "border-slate-200 hover:border-slate-300"
-                          }`}
+                          key={vid.id}
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-white border-2 border-slate-950 rounded shadow-sm"
                         >
-                          <div className="cursor-grab text-slate-400 hover:text-slate-600 px-1">
-                            <Move className="w-4 h-4" />
-                          </div>
-                          <div className="w-12 h-12 bg-white rounded border border-slate-200 p-1 flex items-center justify-center flex-shrink-0">
-                            <img src={img} alt="preview" className="max-h-full max-w-full object-contain" loading="lazy" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-black tracking-wide ${
-                                isMain ? "bg-slate-950 text-white" : "bg-slate-200 text-slate-600"
-                              }`}>
-                                {isMain ? "Principal" : `Foto ${index + 1}`}
-                              </span>
-                              {img.startsWith("data:") && (
-                                <span className="text-[9px] text-slate-400 font-mono">
-                                  {formatSize(img)}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[9px] text-slate-400 truncate mt-0.5">
-                              {img.startsWith("data:") ? "WebP Compactada" : "SVG Local"}
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => handleEditExistingImage(index)}
-                              className="p-1 text-[10px] text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-400 rounded bg-white font-bold transition-all cursor-pointer flex items-center gap-1"
-                              title="Editar Imagem"
-                            >
-                              <Crop className="w-3 h-3" />
-                              <span>Editar</span>
-                            </button>
-                            {!isMain && (
-                              <button
-                                type="button"
-                                onClick={() => setAsMainImage(index)}
-                                className="p-1 text-[10px] text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-400 rounded bg-white font-bold transition-all cursor-pointer"
-                                title="Tornar Foto Principal"
-                              >
-                                Principal
-                              </button>
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
+                            {parsed.thumbnail ? (
+                              <div className="relative w-16 h-10 bg-slate-100 border border-slate-200 rounded overflow-hidden flex-shrink-0">
+                                <img src={parsed.thumbnail} alt={vid.title} className="w-full h-full object-cover animate-fade-in" loading="lazy" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                  <Play className="w-4 h-4 text-white fill-white" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-16 h-10 bg-slate-100 border border-slate-200 rounded flex items-center justify-center flex-shrink-0">
+                                <Film className="w-4 h-4 text-slate-400" />
+                              </div>
                             )}
+                            <div className="min-w-0 flex-1 sm:flex-initial text-slate-950">
+                              <p className="font-bold text-xs truncate max-w-[200px]">{vid.title}</p>
+                              <div className="flex gap-1.5 mt-1">
+                                <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                                  {parsed.provider || "Desconhecido"}
+                                </span>
+                                {vid.is_main && (
+                                  <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded">Principal</span>
+                                )}
+                                {vid.show_in_gallery && (
+                                  <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-900 text-white rounded">Na Galeria</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:justify-start border-t sm:border-t-0 pt-2 sm:pt-0">
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
+                              <input
+                                type="radio"
+                                name={`mainVideoRadio-${vid.id}`}
+                                checked={vid.is_main}
+                                onChange={() => handleToggleVideoMain(vid.id)}
+                                className="w-4 h-4 text-slate-900 accent-slate-950 focus:ring-0"
+                              />
+                              <span>Principal</span>
+                            </label>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
+                              <input
+                                type="checkbox"
+                                checked={vid.show_in_gallery}
+                                onChange={() => handleToggleVideoGallery(vid.id)}
+                                className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
+                              />
+                              <span>Galeria</span>
+                            </label>
+
                             <button
                               type="button"
-                              onClick={() => removeImage(index)}
-                              className="p-1 text-xs text-red-500 hover:text-red-700 rounded transition-colors cursor-pointer"
+                              onClick={() => handleDeleteVideo(vid.id)}
+                              className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded border border-red-200 transition-colors cursor-pointer"
+                              title="Excluir vídeo"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -701,262 +701,267 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                       );
                     })}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-xs text-slate-500 italic py-2">
+                    Nenhum vídeo adicionado para este produto.
+                  </p>
+                )}
+
+                {formState.videos.length < 3 ? (
+                  <div className="mt-4 border-t border-dashed border-slate-300 pt-4 space-y-3">
+                    <h4 className="font-extrabold text-xs text-slate-950 uppercase">Adicionar Novo Vídeo</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase text-slate-500">Título do Vídeo</label>
+                        <input
+                          type="text"
+                          value={newVideoTitle}
+                          onChange={(e) => setNewVideoTitle(e.target.value)}
+                          placeholder="Ex: Demonstração do Produto"
+                          className="w-full px-3 py-1.5 text-xs border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-white font-bold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase text-slate-500">URL ou Link do Vídeo</label>
+                        <input
+                          type="text"
+                          value={newVideoUrl}
+                          onChange={(e) => setNewVideoUrl(e.target.value)}
+                          placeholder="YouTube, Vimeo ou Cloudflare Stream"
+                          className="w-full px-3 py-1.5 text-xs border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-white font-bold"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
+                          <input
+                            type="checkbox"
+                            checked={newVideoIsMain}
+                            onChange={(e) => setNewVideoIsMain(e.target.checked)}
+                            className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
+                          />
+                          <span>Tornar Principal</span>
+                        </label>
+                        <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
+                          <input
+                            type="checkbox"
+                            checked={newVideoShowInGallery}
+                            onChange={(e) => setNewVideoShowInGallery(e.target.checked)}
+                            className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
+                          />
+                          <span>Exibir na Galeria</span>
+                        </label>
+                      </div>
+
+                      {newVideoUrl && (
+                        <div className="flex items-center gap-2 border border-slate-200 p-1.5 rounded bg-white max-w-full sm:max-w-xs">
+                          {(() => {
+                            const parsed = parseVideoUrl(newVideoUrl);
+                            if (parsed.provider && parsed.thumbnail) {
+                              return (
+                                <>
+                                  <img src={parsed.thumbnail} alt="Thumbnail Preview" className="w-12 h-8 object-cover rounded flex-shrink-0" loading="lazy" />
+                                  <div className="min-w-0">
+                                    <p className="text-[9px] font-bold text-green-600 flex items-center gap-0.5">
+                                      <Check className="w-3.5 h-3.5 text-green-600" /> Link Válido
+                                    </p>
+                                    <p className="text-[8px] text-slate-400 capitalize truncate font-mono">{parsed.provider} ID: {parsed.id}</p>
+                                  </div>
+                                </>
+                              );
+                            } else {
+                              return (
+                                <div className="flex items-center gap-1.5 px-2 py-1">
+                                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                                  <span className="text-[9px] font-bold text-red-500">Link de Vídeo Inválido</span>
+                                </div>
+                              );
+                            }
+                          })()}
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleAddVideo}
+                        disabled={!isValidVideoUrl(newVideoUrl)}
+                        className="px-4 py-2 bg-slate-950 hover:bg-slate-900 text-white disabled:bg-slate-350 disabled:text-slate-500 font-bold text-xs rounded transition-colors uppercase tracking-wider cursor-pointer"
+                      >
+                        Adicionar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-50 text-amber-800 rounded border border-amber-200 text-xs font-bold flex items-center gap-2 mt-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Limite máximo de 3 vídeos atingido para este produto. Remova um vídeo para adicionar outro.</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4 pt-2">
-            <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-              Especificações & Vídeo
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Dimensões *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.dimensions}
-                  onChange={(e) => setFormState({ ...formState, dimensions: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Material (PT) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.material_pt}
-                  onChange={(e) => setFormState({ ...formState, material_pt: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-            </div>
+          {/* Right Column (lg:col-span-5) */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* Fotos do Produto */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
+                Fotos do Produto (Máximo 7)
+              </h3>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Garantia (PT) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.warranty_pt}
-                  onChange={(e) => setFormState({ ...formState, warranty_pt: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Prazo Entrega (PT) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.delivery_time_pt}
-                  onChange={(e) => setFormState({ ...formState, delivery_time_pt: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-            </div>
+              <div className="space-y-3">
+                <label className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-center cursor-pointer transition-all hover:bg-slate-50/60 ${uploading ? "opacity-60 pointer-events-none" : "border-slate-300 hover:border-slate-400"}`}>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <Upload className="w-8 h-8 text-slate-400" />
+                  <div className="font-bold text-slate-800">
+                    {uploading ? "Compactando e convertendo..." : "Clique ou Arraste fotos aqui"}
+                  </div>
+                  <div className="text-[10px] text-slate-400 leading-normal">
+                    Conversão automática para WebP.<br />
+                    Max: Principal 500 KB / Galeria 300 KB.<br />
+                    Formatos aceitos: JPG, PNG, WEBP, SVG.
+                  </div>
+                </label>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Material (ES) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.material_es}
-                  onChange={(e) => setFormState({ ...formState, material_es: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-500 uppercase">Garantia (ES) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formState.warranty_es}
-                  onChange={(e) => setFormState({ ...formState, warranty_es: e.target.value })}
-                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4 border-2 border-slate-950 p-4 rounded bg-slate-50/30">
-              <div className="flex items-center gap-2 border-b-2 border-slate-950 pb-2">
-                <Film className="w-5 h-5 text-slate-950" />
-                <h3 className="font-black text-sm uppercase text-slate-950">Vídeos do Produto (Máximo 3)</h3>
-              </div>
-
-              {formState.videos.length > 0 ? (
-                <div className="space-y-3">
-                  {formState.videos.map((vid) => {
-                    const parsed = parseVideoUrl(vid.url);
-                    return (
-                      <div
-                        key={vid.id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-white border-2 border-slate-950 rounded shadow-sm"
-                      >
-                        <div className="flex items-center gap-3 w-full sm:w-auto">
-                          {parsed.thumbnail ? (
-                            <div className="relative w-16 h-10 bg-slate-100 border border-slate-200 rounded overflow-hidden flex-shrink-0">
-                              <img src={parsed.thumbnail} alt={vid.title} className="w-full h-full object-cover animate-fade-in" loading="lazy" />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                <Play className="w-4 h-4 text-white fill-white" />
+                {uploadedImages.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                      Galeria ({uploadedImages.length} de 7) — Arraste para reordenar
+                    </div>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {uploadedImages.map((img, index) => {
+                        const isMain = index === 0;
+                        return (
+                          <div
+                            key={index}
+                            draggable
+                            onDragStart={() => handleDragStart(index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDrop={() => handleDrop(index)}
+                            className={`flex items-center gap-3 p-2 bg-slate-50 border-2 rounded-lg transition-all ${
+                              isMain
+                                ? "border-slate-950 shadow-[2px_2px_0px_rgba(0,0,0,1)] bg-amber-50/45"
+                                : "border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            <div className="cursor-grab text-slate-400 hover:text-slate-600 px-1">
+                              <Move className="w-4 h-4" />
+                            </div>
+                            <div className="w-12 h-12 bg-white rounded border border-slate-200 p-1 flex items-center justify-center flex-shrink-0">
+                              <img src={img} alt="preview" className="max-h-full max-w-full object-contain" loading="lazy" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-black tracking-wide ${
+                                  isMain ? "bg-slate-950 text-white" : "bg-slate-200 text-slate-600"
+                                }`}>
+                                  {isMain ? "Principal" : `Foto ${index + 1}`}
+                                </span>
+                                {img.startsWith("data:") && (
+                                  <span className="text-[9px] text-slate-400 font-mono">
+                                    {formatSize(img)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[9px] text-slate-400 truncate mt-0.5">
+                                {img.startsWith("data:") ? "WebP Compactada" : "SVG Local"}
                               </div>
                             </div>
-                          ) : (
-                            <div className="w-16 h-10 bg-slate-100 border border-slate-200 rounded flex items-center justify-center flex-shrink-0">
-                              <Film className="w-4 h-4 text-slate-400" />
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1 sm:flex-initial text-slate-950">
-                            <p className="font-bold text-xs truncate max-w-[200px]">{vid.title}</p>
-                            <div className="flex gap-1.5 mt-1">
-                              <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200">
-                                {parsed.provider || "Desconhecido"}
-                              </span>
-                              {vid.is_main && (
-                                <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded">Principal</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleEditExistingImage(index)}
+                                className="p-1 text-[10px] text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-400 rounded bg-white font-bold transition-all cursor-pointer flex items-center gap-1"
+                                title="Editar Imagem"
+                              >
+                                <Crop className="w-3 h-3" />
+                                <span>Editar</span>
+                              </button>
+                              {!isMain && (
+                                <button
+                                  type="button"
+                                  onClick={() => setAsMainImage(index)}
+                                  className="p-1 text-[10px] text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-400 rounded bg-white font-bold transition-all cursor-pointer"
+                                  title="Tornar Foto Principal"
+                                >
+                                  Principal
+                                </button>
                               )}
-                              {vid.show_in_gallery && (
-                                <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-slate-900 text-white rounded">Na Galeria</span>
-                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="p-1 text-xs text-red-500 hover:text-red-700 rounded transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                        <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:justify-start border-t sm:border-t-0 pt-2 sm:pt-0">
-                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
-                            <input
-                              type="radio"
-                              name={`mainVideoRadio-${vid.id}`}
-                              checked={vid.is_main}
-                              onChange={() => handleToggleVideoMain(vid.id)}
-                              className="w-4 h-4 text-slate-900 accent-slate-950 focus:ring-0"
-                            />
-                            <span>Principal</span>
-                          </label>
-
-                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
-                            <input
-                              type="checkbox"
-                              checked={vid.show_in_gallery}
-                              onChange={() => handleToggleVideoGallery(vid.id)}
-                              className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
-                            />
-                            <span>Galeria</span>
-                          </label>
-
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteVideo(vid.id)}
-                            className="p-1 bg-red-50 hover:bg-red-100 text-red-600 rounded border border-red-200 transition-colors cursor-pointer"
-                            title="Excluir vídeo"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
+            {/* Promoções e Selos (Moved to Right Column) */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
+                Promoções e Selos
+              </h3>
+              
+              <div className="space-y-3">
+                <label className="font-bold text-slate-500 uppercase block mb-1">Selecionar Selos do Produto</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {[
+                    { id: "promo", label: "🏷️ Oferta" },
+                    { id: "featured", label: "⭐ Destaque" },
+                    { id: "bestseller", label: "🔥 Mais Vendido" },
+                    { id: "free_shipping", label: "🚚 Frete Grátis" },
+                    { id: "new", label: "✨ Novo" },
+                    { id: "last_units", label: "⚠️ Últimas Unidades" }
+                  ].map((badge) => {
+                    const isChecked = formState.badges.includes(badge.id);
+                    return (
+                      <button
+                        key={badge.id}
+                        type="button"
+                        onClick={() => handleBadgeToggle(badge.id)}
+                        className={`flex items-center gap-2 px-3 py-2.5 border-2 rounded-lg font-bold text-left cursor-pointer transition-all ${
+                          isChecked
+                            ? "bg-slate-950 text-white border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)] font-bold"
+                            : "bg-white text-slate-700 border-slate-200 hover:border-slate-400 font-bold"
+                        }`}
+                      >
+                        <span className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center flex-shrink-0 text-[10px] ${isChecked ? "bg-accent-amber border-slate-950 text-slate-950 font-bold" : "bg-white border-slate-300 font-bold"}`}>
+                          {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                        </span>
+                        <span>{badge.label}</span>
+                      </button>
                     );
                   })}
                 </div>
-              ) : (
-                <p className="text-xs text-slate-500 italic py-2">
-                  Nenhum vídeo adicionado para este produto.
-                </p>
-              )}
+              </div>
 
-              {formState.videos.length < 3 ? (
-                <div className="mt-4 border-t border-dashed border-slate-300 pt-4 space-y-3">
-                  <h4 className="font-extrabold text-xs text-slate-950 uppercase">Adicionar Novo Vídeo</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500">Título do Vídeo</label>
-                      <input
-                        type="text"
-                        value={newVideoTitle}
-                        onChange={(e) => setNewVideoTitle(e.target.value)}
-                        placeholder="Ex: Demonstração do Produto"
-                        className="w-full px-3 py-1.5 text-xs border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-white font-bold"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase text-slate-500">URL ou Link do Vídeo</label>
-                      <input
-                        type="text"
-                        value={newVideoUrl}
-                        onChange={(e) => setNewVideoUrl(e.target.value)}
-                        placeholder="YouTube, Vimeo ou Cloudflare Stream"
-                        className="w-full px-3 py-1.5 text-xs border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-white font-bold"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
-                        <input
-                          type="checkbox"
-                          checked={newVideoIsMain}
-                          onChange={(e) => setNewVideoIsMain(e.target.checked)}
-                          className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
-                        />
-                        <span>Tornar Principal</span>
-                      </label>
-                      <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-800">
-                        <input
-                          type="checkbox"
-                          checked={newVideoShowInGallery}
-                          onChange={(e) => setNewVideoShowInGallery(e.target.checked)}
-                          className="w-4 h-4 text-slate-900 accent-slate-950 rounded focus:ring-0"
-                        />
-                        <span>Exibir na Galeria</span>
-                      </label>
-                    </div>
-
-                    {newVideoUrl && (
-                      <div className="flex items-center gap-2 border border-slate-200 p-1.5 rounded bg-white max-w-full sm:max-w-xs">
-                        {(() => {
-                          const parsed = parseVideoUrl(newVideoUrl);
-                          if (parsed.provider && parsed.thumbnail) {
-                            return (
-                              <>
-                                <img src={parsed.thumbnail} alt="Thumbnail Preview" className="w-12 h-8 object-cover rounded flex-shrink-0" loading="lazy" />
-                                <div className="min-w-0">
-                                  <p className="text-[9px] font-bold text-green-600 flex items-center gap-0.5">
-                                    <Check className="w-3.5 h-3.5 text-green-600" /> Link Válido
-                                  </p>
-                                  <p className="text-[8px] text-slate-400 capitalize truncate font-mono">{parsed.provider} ID: {parsed.id}</p>
-                                </div>
-                              </>
-                            );
-                          } else {
-                            return (
-                              <div className="flex items-center gap-1.5 px-2 py-1">
-                                <AlertTriangle className="w-4 h-4 text-red-500" />
-                                <span className="text-[9px] font-bold text-red-500">Link de Vídeo Inválido</span>
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={handleAddVideo}
-                      disabled={!isValidVideoUrl(newVideoUrl)}
-                      className="px-4 py-2 bg-slate-950 hover:bg-slate-900 text-white disabled:bg-slate-350 disabled:text-slate-500 font-bold text-xs rounded transition-colors uppercase tracking-wider cursor-pointer"
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-3 bg-amber-50 text-amber-800 rounded border border-amber-200 text-xs font-bold flex items-center gap-2 mt-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Limite máximo de 3 vídeos atingido para este produto. Remova um vídeo para adicionar outro.</span>
-                </div>
-              )}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-500 uppercase">Data Limite da Oferta Relâmpago (Countdown)</label>
+                <input
+                  type="datetime-local"
+                  value={formState.countdown_end}
+                  onChange={(e) => setFormState({ ...formState, countdown_end: e.target.value })}
+                  className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
+                />
+                <p className="text-[10px] text-slate-400">Ativa o cronômetro regressivo na página inicial do site para este produto.</p>
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -999,7 +1004,6 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                 className="w-full px-3 py-2 border-2 border-slate-950 rounded font-bold"
               />
             </div>
-          </div>
 
           <div className="space-y-4 pt-2">
             <h3 className="font-bold text-slate-900 border-b-2 border-slate-950 pb-1 flex items-center gap-1 text-[11px] uppercase tracking-wider">
