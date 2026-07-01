@@ -35,10 +35,19 @@ function HomeContent() {
 
   const [now, setNow] = useState(new Date());
 
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Auto play hero carousel
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    const activeHeroes = promotions?.filter(p => p.type === "hero" && p.active) || [];
+    const count = activeHeroes.length > 0 ? activeHeroes.length : 1;
+    if (count <= 1) return;
+
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % count);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [promotions]);
 
   // Reset filters when changing category
   useEffect(() => {
@@ -307,86 +316,122 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Hero Section */}
+      {/* Dynamic Banner Hero Carousel */}
       {(() => {
-        const heroPromo = promotions?.find(p => p.type === "hero" && p.active);
-        const heroTitle = heroPromo ? (locale === "pt" ? heroPromo.title_pt : heroPromo.title_es) : t("hero.title");
-        const heroSubtitle = heroPromo ? (locale === "pt" ? heroPromo.subtitle_pt : heroPromo.subtitle_es) : t("hero.subtitle");
-        const heroImage = heroPromo ? (locale === "pt" ? heroPromo.image_url : (heroPromo.image_url_es || heroPromo.image_url)) : "/hero-furniture.jpg";
-        const linkUrl = heroPromo?.link_url || "#produtos";
-        
+        const activeHeroes = promotions?.filter(p => p.type === "hero" && p.active) || [];
+        const displayPromos = activeHeroes.length > 0 ? activeHeroes : [
+          {
+            id: "fallback",
+            type: "hero",
+            title_pt: "Seu novo móvel sem complicação.",
+            title_es: "Tu nuevo mueble sin complicaciones.",
+            subtitle_pt: "Móveis e cadeiras para casa e escritório com uma experiência de compra simples e transparente.",
+            subtitle_es: "Muebles y sillas para el hogar y la oficina con una experiencia de compra simple y transparente.",
+            image_url: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80",
+            image_url_es: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80",
+            link_url: "#produtos",
+            active: true
+          }
+        ];
+
         return (
-          <section className="relative overflow-hidden bg-slate-950 text-white py-20 sm:py-28 font-sans">
-            {/* Abstract Background pattern */}
-            <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
-            <div className="absolute -left-40 -top-40 w-96 h-96 rounded-full bg-slate-900 filter blur-3xl opacity-50" />
-            <div className="absolute right-0 bottom-0 w-120 h-120 rounded-full bg-slate-800/40 filter blur-3xl opacity-30" />
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              {/* Text Content */}
-              <div className="lg:col-span-7 space-y-6 sm:space-y-8 animate-slide-up text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-850 border border-slate-800 text-xs font-semibold tracking-wide text-accent-amber">
-                  <span className="w-2 h-2 rounded-full bg-accent-amber animate-pulse" />
-                  {locale === "pt" ? "Destaques em Móveis & Tecnologia" : "Destacados en Muebles & Tecnología"}
-                </div>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 font-sans">
+            <div className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] bg-slate-900 shadow-premium-lg border border-slate-100/50 aspect-[16/9] md:aspect-[21/8] min-h-[220px] sm:min-h-[380px] group">
+              {displayPromos.map((promo, idx) => {
+                const isVisible = idx === activeSlide;
+                const heroTitle = locale === "pt" ? promo.title_pt : promo.title_es;
+                const heroSubtitle = locale === "pt" ? promo.subtitle_pt : promo.subtitle_es;
+                const heroImage = locale === "pt" ? promo.image_url : (promo.image_url_es || promo.image_url);
+                const hasValidImage = heroImage && !heroImage.startsWith("/");
+                const finalImage = hasValidImage ? heroImage : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
                 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-                  {heroTitle}
-                </h1>
-                
-                <p className="text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed">
-                  {heroSubtitle}
-                </p>
+                // Show text overlay if there is a custom title (not blank)
+                const showTextOverlay = heroTitle && heroTitle.trim().length > 0;
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href={linkUrl}
-                    className="px-8 py-3.5 bg-accent-amber hover:bg-amber-600 text-slate-900 rounded-md font-bold text-center transition-all shadow-lg hover:shadow-accent-amber/20 flex items-center justify-center gap-2"
+                return (
+                  <div
+                    key={promo.id}
+                    className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+                      isVisible ? "opacity-100 z-10 scale-100" : "opacity-0 z-0 scale-95 pointer-events-none"
+                    }`}
                   >
-                    <span>{t("hero.cta_products")}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <a
-                    href="https://wa.me/595981123456"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-md font-semibold text-center border border-slate-700 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <MessageSquare className="w-4.5 h-4.5 text-green-500 fill-green-500" />
-                    <span>{t("hero.cta_whatsapp")}</span>
-                  </a>
-                </div>
+                    {showTextOverlay ? (
+                      <>
+                        {/* Background Image */}
+                        <img
+                          src={finalImage}
+                          alt={heroTitle}
+                          className="absolute inset-0 w-full h-full object-cover select-none transform transition-transform duration-[8000ms] ease-out group-hover:scale-105"
+                        />
 
-                {/* Micro Stats */}
-                <div className="grid grid-cols-3 gap-6 pt-6 sm:pt-10 border-t border-slate-900 max-w-md">
-                  <div>
-                    <p className="text-2xl font-bold text-white font-mono">100%</p>
-                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Garantido" : "Garantizado"}</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white font-mono">24/48h</p>
-                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Envio Rápido" : "Envío Rápido"}</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white font-mono">Premium</p>
-                    <p className="text-xs text-slate-500 mt-1">{locale === "pt" ? "Alto Padrão" : "Alto Nivel"}</p>
-                  </div>
-                </div>
-              </div>
+                        {/* Dark gradient overlay for text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent" />
 
-              {/* Graphic mockup with dynamic banner image */}
-              <div className="lg:col-span-5 hidden lg:flex justify-end animate-fade-in">
-                <div className="w-full max-w-md rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 p-4 border border-slate-850 shadow-2xl relative group">
-                  <div className="h-72 flex items-center justify-center overflow-hidden bg-slate-950/40 rounded-xl relative">
-                    <img
-                      src={heroImage}
-                      alt={heroTitle}
-                      className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-500 rounded-lg"
-                      loading="lazy"
+                        {/* Dynamic Text Content overlay */}
+                        <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-2xl text-left text-white z-20 space-y-4 sm:space-y-6">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/35 text-[9px] sm:text-xs font-black tracking-wider uppercase text-amber-400 w-max animate-fade-in">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            {locale === "pt" ? "Destaques em Oferta" : "Destacados en Oferta"}
+                          </div>
+
+                          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase font-sans text-white">
+                            {heroTitle}
+                          </h1>
+
+                          {heroSubtitle && (
+                            <p className="text-[10px] sm:text-xs md:text-sm text-slate-300 font-bold leading-relaxed max-w-lg line-clamp-3">
+                              {heroSubtitle}
+                            </p>
+                          )}
+
+                          <div className="flex items-center gap-3 pt-2">
+                            <Link
+                              href={promo.link_url || "#produtos"}
+                              className="px-5 py-2.5 sm:px-8 sm:py-3.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[10px] sm:text-xs rounded-xl transition-all shadow-lg hover:shadow-amber-500/20 flex items-center justify-center gap-2 cursor-pointer border-0 uppercase tracking-wider"
+                            >
+                              <span>{t("hero.cta_products")}</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </Link>
+                            <a
+                              href="https://wa.me/595981123456"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-5 py-2.5 sm:px-8 sm:py-3.5 bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur text-white font-black text-[10px] sm:text-xs rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
+                            >
+                              <MessageSquare className="w-4 h-4 text-green-500 fill-green-500" />
+                              <span>WhatsApp</span>
+                            </a>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      /* Clean Full Width Image Banner Mode (Link Clickable) */
+                      <Link href={promo.link_url || "#produtos"} className="absolute inset-0 w-full h-full block cursor-pointer">
+                        <img
+                          src={finalImage}
+                          alt="Banner Muebles.py"
+                          className="w-full h-full object-cover select-none transition-transform duration-[8000ms] ease-out group-hover:scale-105"
+                        />
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Slider Dots navigation controls */}
+              {displayPromos.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex gap-2">
+                  {displayPromos.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveSlide(idx)}
+                      className={`w-2 h-2 rounded-full transition-all cursor-pointer border-0 p-0 ${
+                        activeSlide === idx ? "bg-amber-500 w-5" : "bg-white/50 hover:bg-white"
+                      }`}
                     />
-                  </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           </section>
         );
