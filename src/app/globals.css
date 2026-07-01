@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-dark: #0f172a;
+  --color-secondary-dark: #1e293b;
+  --color-accent-amber: #f59e0b;
+  --color-success-green: #22c55e;
+  --color-neutral-slate: #f8fafc;
+  --color-neutral-border: #e2e8f0;
+  --color-neutral-muted: #cbd5e1;
+  --color-neutral-medium: #64748b;
+  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  
+  --animate-fade-in: fade-in 0.3s ease-out forwards;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-in-right: slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism utility */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+}
+
+/* Premium shadows */
+.shadow-premium {
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+}
+
+.shadow-premium-lg {
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07), 0 1px 5px rgba(15, 23, 42, 0.03);
+}
+
+/* Print/Canvas generation optimization */
+.canvas-target {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* ===================================================
+   OTIMIZAÇÕES RESPONSIVAS MOBILE & TABLET (ADMIN PANEL)
+   =================================================== */
+
+@media (max-width: 1023px) {
+  /* Enforce min-height of 48px for form fields on mobile and tablet */
+  .font-sans input[type="text"],
+  .font-sans input[type="number"],
+  .font-sans input[type="password"],
+  .font-sans input[type="email"],
+  .font-sans input[type="datetime-local"],
+  .font-sans select,
+  .font-sans textarea {
+    min-height: 48px !important;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    width: 100% !important;
+  }
+
+  /* Boost visible height of submit/main action buttons in form blocks to 48px */
+  .font-sans button.px-4,
+  .font-sans button.px-4\.5,
+  .font-sans button.px-5,
+  .font-sans button.w-full,
+  .font-sans form button {
+    min-height: 48px !important;
+  }
+
+  /* pseudo touch-target of 44px x 44px for smaller action icons/buttons without enlarging them visually */
+  .font-sans button,
+  .font-sans a.btn,
+  .font-sans nav a {
+    position: relative;
+  }
+  
+  .font-sans button::after,
+  .font-sans a.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    z-index: 10;
+  }
+  
+  /* Sidebar responsive spacing adjustments */
+  .font-sans aside {
+    height: 100vh !important;
+  }
+}
