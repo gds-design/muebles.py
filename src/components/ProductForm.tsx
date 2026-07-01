@@ -588,16 +588,6 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-500 uppercase">Garantia (PT) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formState.warranty_pt}
-                    onChange={(e) => setFormState({ ...formState, warranty_pt: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-350 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                  />
-                </div>
-                <div className="space-y-1.5">
                   <label className="font-bold text-slate-500 uppercase">Material (PT) *</label>
                   <input
                     type="text"
@@ -618,16 +608,6 @@ export default function ProductForm({ isEditing = false, initialData = null }: P
                     required
                     value={formState.material_es}
                     onChange={(e) => setFormState({ ...formState, material_es: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-350 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-500 uppercase">Garantia (ES) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formState.warranty_es}
-                    onChange={(e) => setFormState({ ...formState, warranty_es: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-350 rounded focus:outline-none focus:border-accent-amber bg-slate-50/50 font-bold"
                   />
                 </div>

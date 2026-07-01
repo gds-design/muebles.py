@@ -436,10 +436,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <span className="text-slate-400 font-bold uppercase text-[9px]">{t("product.material")}</span>
                   <p className="text-slate-800 font-medium text-[11px] line-clamp-1" title={material}>{material}</p>
                 </div>
-                <div className="space-y-0.5">
-                  <span className="text-slate-400 font-bold uppercase text-[9px]">{t("product.warranty")}</span>
-                  <p className="text-slate-800 font-medium text-[11px]">{warranty}</p>
-                </div>
                 <div className="space-y-0.5 col-span-2">
                   <span className="text-slate-400 font-bold uppercase text-[9px]">{locale === "pt" ? "Prazo de Entrega" : "Plazo de Entrega"}</span>
                   <p className="text-slate-800 font-medium text-[11px]">{deliveryTime}</p>
@@ -524,19 +520,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             )}
 
             {/* Guarantee Policy Trust List */}
-            <div className="grid grid-cols-3 gap-3 border-t border-slate-100 pt-6 text-[10px] text-slate-400 leading-snug">
+            <div className="grid grid-cols-2 gap-3 border-t border-slate-100 pt-6 text-[10px] text-slate-400 leading-snug">
               <div className="flex gap-2">
                 <Truck className="w-6 h-6 text-slate-300 flex-shrink-0" />
                 <div>
                   <h4 className="font-bold text-slate-600">Frete a Combinar</h4>
                   <p>Entrega programada para todo o Paraguai.</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <ShieldCheck className="w-6 h-6 text-slate-300 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold text-slate-600">Garantia Integrada</h4>
-                  <p>Cobertura direta e suporte técnico ágil.</p>
                 </div>
               </div>
               <div className="flex gap-2">
