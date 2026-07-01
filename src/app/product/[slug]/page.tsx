@@ -142,6 +142,58 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const deliveryTime = locale === "pt" ? product.delivery_time_pt : product.delivery_time_es;
   const categoryName = categories.find((c) => c.id === product.category_id)?.[locale === "pt" ? "name_pt" : "name_es"] || "";
 
+  const getExtraSpecs = () => {
+    const extra: { label: string; value: string }[] = [];
+    
+    // Direct keys check on dynamic object
+    if (product.potencia) extra.push({ label: locale === "pt" ? "Potência" : "Potencia", value: String(product.potencia) });
+    else if (product.potency) extra.push({ label: locale === "pt" ? "Potência" : "Potencia", value: String(product.potency) });
+    
+    if (product.voltagem) extra.push({ label: locale === "pt" ? "Voltagem" : "Voltaje", value: String(product.voltagem) });
+    else if (product.voltage) extra.push({ label: locale === "pt" ? "Voltagem" : "Voltaje", value: String(product.voltage) });
+    
+    if (product.capacidade) extra.push({ label: locale === "pt" ? "Capacidade" : "Capacidad", value: String(product.capacidade) });
+    else if (product.capacity) extra.push({ label: locale === "pt" ? "Capacidade" : "Capacidad", value: String(product.capacity) });
+    
+    // Scan text sources (description, dimensions, materials) for keywords
+    const searchInText = (text: string) => {
+      if (!text) return;
+      
+      // Voltage regex search
+      if (!extra.some(e => e.label.toLowerCase().includes("volt"))) {
+        const voltMatch = text.match(/(?:voltagem|voltaje|voltagens|tensão|tension):\s*([^\n.,;]+)/i) || 
+                          text.match(/(\d+\s*v\b)/i);
+        if (voltMatch && voltMatch[1]) {
+          extra.push({ label: locale === "pt" ? "Voltagem" : "Voltaje", value: voltMatch[1].trim() });
+        }
+      }
+      
+      // Potency/Power regex search
+      if (!extra.some(e => e.label.toLowerCase().includes("potên") || e.label.toLowerCase().includes("poten"))) {
+        const potMatch = text.match(/(?:potência|potencia):\s*([^\n.,;]+)/i) || 
+                         text.match(/(\d+\s*w\b)/i);
+        if (potMatch && potMatch[1]) {
+          extra.push({ label: locale === "pt" ? "Potência" : "Potencia", value: potMatch[1].trim() });
+        }
+      }
+
+      // Capacity regex search
+      if (!extra.some(e => e.label.toLowerCase().includes("capac"))) {
+        const capMatch = text.match(/(?:capacidade|capacidad):\s*([^\n.,;]+)/i) ||
+                         text.match(/(\d+\s*(?:l(?:itros)?|kg|kilos|litros))/i);
+        if (capMatch && capMatch[1]) {
+          extra.push({ label: locale === "pt" ? "Capacidade" : "Capacidad", value: capMatch[1].trim() });
+        }
+      }
+    };
+
+    searchInText(locale === "pt" ? product.description_pt : product.description_es);
+    searchInText(product.dimensions);
+    searchInText(locale === "pt" ? product.material_pt : product.material_es);
+
+    return extra;
+  };
+
   const isPromo = !!product.promo_price;
   const activePrice = product.promo_price || product.price;
   const saving = isPromo ? product.price - (product.promo_price as number) : 0;
@@ -236,11 +288,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 shadow-sm">
           
           {/* Product Gallery Column */}
-          <div className="lg:col-span-6 space-y-4">
+          <div className="lg:col-span-6 space-y-6">
             
             {/* Main zoomable preview */}
             <div
-              className="h-80 sm:h-[450px] w-full rounded-2xl bg-slate-50 border border-slate-100 p-8 flex items-center justify-center overflow-hidden relative cursor-zoom-in group/mainimg"
+              className="h-96 sm:h-[500px] w-full rounded-2xl bg-slate-50 border border-slate-100 p-8 flex items-center justify-center overflow-hidden relative cursor-zoom-in group/mainimg"
               onMouseMove={selectedItem?.type === "image" ? handleMouseMove : undefined}
               onMouseLeave={selectedItem?.type === "image" ? handleMouseLeave : undefined}
             >
@@ -249,7 +301,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 alt={name}
                 style={selectedItem?.type === "image" ? zoomStyle : {}}
                 className={`max-h-full max-w-full object-contain transition-all duration-150 ease-out ${
-                  selectedItem?.type === "video" ? "brightness-90 cursor-default" : ""
+                  selectedItem?.type === "video" ? "brightness-95 cursor-default" : ""
                 }`}
                 loading="lazy"
               />
@@ -258,9 +310,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               {selectedItem?.type === "video" && (
                 <button
                   onClick={() => handleWatchVideo(selectedItem.videoUrl, selectedItem.videoTitle)}
-                  className="absolute z-10 flex flex-col items-center justify-center gap-2.5 bg-slate-900/90 hover:bg-slate-950 text-white font-bold text-sm px-6 py-4 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-md cursor-pointer border border-white/20 animate-pulse"
+                  className="absolute z-10 flex flex-col items-center justify-center gap-2.5 bg-slate-905/95 hover:bg-slate-950 text-white font-bold text-sm px-7 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300 backdrop-blur-md cursor-pointer border border-white/20 animate-pulse"
                 >
-                  <Play className="w-8 h-8 fill-white text-white" />
+                  <Play className="w-10 h-10 fill-white text-white" />
                   <span>{locale === "pt" ? "▶ Assistir Vídeo" : "▶ Ver Video"}</span>
                 </button>
               )}
@@ -279,7 +331,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {/* Thumbnail Carousel Selector */}
             {galleryItems.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto py-1">
+              <div className="flex gap-4 overflow-x-auto py-1">
                 {galleryItems.map((item, idx) => (
                   <button
                     key={idx}
@@ -351,41 +403,55 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </p>
             </div>
 
-            {/* Structured Specifications Grid */}
-            <div className="grid grid-cols-2 gap-4 py-4 bg-slate-50/50 rounded-2xl p-4 border border-slate-100/50 text-xs">
-              {product.brand && (
-                <div className="space-y-1">
-                  <span className="text-slate-400 font-bold uppercase">{locale === "pt" ? "Marca" : "Marca"}</span>
-                  <p className="text-slate-800 font-black">{product.brand}</p>
+            {/* Structured Specifications Grid (Premium Card) */}
+            <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-100/80 space-y-4">
+              <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider border-b border-slate-200 pb-1.5 flex items-center gap-1">
+                <span>📐 {locale === "pt" ? "Especificações Técnicas" : "Especificaciones Técnicas"}</span>
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs">
+                {product.brand && (
+                  <div className="space-y-0.5">
+                    <span className="text-slate-400 font-bold uppercase text-[9px]">{locale === "pt" ? "Marca" : "Marca"}</span>
+                    <p className="text-slate-800 font-bold text-[11px]">{product.brand}</p>
+                  </div>
+                )}
+                {product.model && (
+                  <div className="space-y-0.5">
+                    <span className="text-slate-400 font-bold uppercase text-[9px]">{locale === "pt" ? "Modelo" : "Modelo"}</span>
+                    <p className="text-slate-800 font-bold text-[11px]">{product.model}</p>
+                  </div>
+                )}
+                {product.sku && (
+                  <div className="space-y-0.5 col-span-2">
+                    <span className="text-slate-400 font-bold uppercase text-[9px]">SKU</span>
+                    <p className="text-slate-800 font-mono font-bold text-[11px]">{product.sku}</p>
+                  </div>
+                )}
+                <div className="space-y-0.5">
+                  <span className="text-slate-400 font-bold uppercase text-[9px]">{t("product.dimensions")}</span>
+                  <p className="text-slate-800 font-medium text-[11px]">{product.dimensions}</p>
                 </div>
-              )}
-              {product.model && (
-                <div className="space-y-1">
-                  <span className="text-slate-400 font-bold uppercase">{locale === "pt" ? "Modelo" : "Modelo"}</span>
-                  <p className="text-slate-800 font-black">{product.model}</p>
+                <div className="space-y-0.5">
+                  <span className="text-slate-400 font-bold uppercase text-[9px]">{t("product.material")}</span>
+                  <p className="text-slate-800 font-medium text-[11px] line-clamp-1" title={material}>{material}</p>
                 </div>
-              )}
-              {product.sku && (
-                <div className="space-y-1 col-span-2">
-                  <span className="text-slate-400 font-bold uppercase">SKU</span>
-                  <p className="text-slate-800 font-mono font-bold">{product.sku}</p>
+                <div className="space-y-0.5">
+                  <span className="text-slate-400 font-bold uppercase text-[9px]">{t("product.warranty")}</span>
+                  <p className="text-slate-800 font-medium text-[11px]">{warranty}</p>
                 </div>
-              )}
-              <div className="space-y-1">
-                <span className="text-slate-400 font-semibold uppercase">{t("product.dimensions")}</span>
-                <p className="text-slate-800 font-medium">{product.dimensions}</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-slate-400 font-semibold uppercase">{t("product.material")}</span>
-                <p className="text-slate-800 font-medium line-clamp-1">{material}</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-slate-400 font-semibold uppercase">{t("product.warranty")}</span>
-                <p className="text-slate-800 font-medium">{warranty}</p>
-              </div>
-              <div className="space-y-1 col-span-2">
-                <span className="text-slate-400 font-semibold uppercase">{t("product.delivery_estimate")}</span>
-                <p className="text-slate-800 font-medium">{deliveryTime}</p>
+                <div className="space-y-0.5 col-span-2">
+                  <span className="text-slate-400 font-bold uppercase text-[9px]">{locale === "pt" ? "Prazo de Entrega" : "Plazo de Entrega"}</span>
+                  <p className="text-slate-800 font-medium text-[11px]">{deliveryTime}</p>
+                </div>
+
+                {/* Render extracted details for appliances dynamically */}
+                {getExtraSpecs().map((spec, index) => (
+                  <div key={index} className="space-y-0.5">
+                    <span className="text-slate-400 font-bold uppercase text-[9px]">{spec.label}</span>
+                    <p className="text-slate-800 font-bold text-[11px]">{spec.value}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -411,30 +477,35 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button
-                    onClick={() => addToCart(product, quantity)}
-                    className="flex-1 bg-slate-900 hover:bg-slate-850 text-white py-3.5 px-6 rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    <span>{t("product.button_buy")}</span>
-                  </button>
+                <div className="space-y-3 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Comprar Agora */}
+                    <button
+                      onClick={() => addToCart(product, quantity)}
+                      className="h-13 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 cursor-pointer border-2 border-slate-950"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>{t("product.button_buy")}</span>
+                    </button>
 
-                  <button
-                    onClick={handleWhatsAppOrder}
-                    className="flex-1 border border-slate-200 text-slate-700 py-3.5 px-6 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 bg-white cursor-pointer"
+                    {/* WhatsApp Order */}
+                    <button
+                      onClick={handleWhatsAppOrder}
+                      className="h-13 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 cursor-pointer border-2 border-emerald-600"
+                    >
+                      <MessageSquare className="w-4.5 h-4.5 text-white fill-white" />
+                      <span>{t("product.button_whatsapp")}</span>
+                    </button>
+                  </div>
+
+                  {/* Solicitar Orçamento */}
+                  <Link
+                    href={`/checkout?quote=true&prod=${product.id}&qty=${quantity}`}
+                    className="w-full h-13 border-2 border-dashed border-slate-350 text-slate-600 rounded-xl font-bold text-sm hover:border-slate-550 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 bg-slate-50/50 hover:bg-slate-100"
                   >
-                    <MessageSquare className="w-4.5 h-4.5 text-green-500 fill-green-500" />
-                    <span>{t("product.button_whatsapp")}</span>
-                  </button>
+                    <span>{t("product.button_quote")}</span>
+                  </Link>
                 </div>
-
-                <Link
-                  href={`/checkout?quote=true&prod=${product.id}&qty=${quantity}`}
-                  className="w-full text-center block border border-slate-200 border-dashed text-slate-500 py-2.5 rounded-lg font-medium text-xs hover:border-slate-400 hover:text-slate-700 transition-colors"
-                >
-                  {t("product.button_quote")}
-                </Link>
               </div>
             ) : (
               <div className="p-4 bg-slate-50 rounded-lg text-slate-500 text-sm text-center border border-slate-200 border-dashed">
