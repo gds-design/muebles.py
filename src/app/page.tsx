@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import { LeadPopup } from "@/components/LeadPopup";
-import { Armchair, Gamepad2, Table, Laptop, BookOpen, Percent, ChevronDown, Check, ArrowRight, MessageSquare, ShoppingCart, Star, Heart, FileText, Tv, Plug, Clock } from "lucide-react";
+import { Armchair, Gamepad2, Table, Laptop, BookOpen, Percent, ChevronDown, Check, ArrowRight, MessageSquare, ShoppingCart, Star, Heart, FileText, Tv, Plug, Clock, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -24,12 +24,31 @@ function HomeContent() {
   const [searchFilter, setSearchFilter] = useState("");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+  // Smart Filter States
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState("relevance");
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+  const [onlyInStock, setOnlyInStock] = useState(false);
+  const [onlyPromo, setOnlyPromo] = useState(false);
+  const [onlyFreeShipping, setOnlyFreeShipping] = useState(false);
+
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Reset filters when changing category
+  useEffect(() => {
+    setSelectedBrand("all");
+    setSortBy("relevance");
+    setOnlyInStock(false);
+    setOnlyPromo(false);
+    setOnlyFreeShipping(false);
+    setMaxPrice(undefined);
+  }, [activeCategory]);
 
   const getTimeRemaining = (endTimeStr: string) => {
     const total = Date.parse(endTimeStr) - now.getTime();
@@ -46,6 +65,7 @@ function HomeContent() {
     if (searchVal) {
       setSearchFilter(searchVal);
       setActiveCategory("all");
+      setShowFilters(true); // Open filters to let them refine the search
     } else {
       setSearchFilter("");
     }
@@ -129,12 +149,54 @@ function HomeContent() {
     printWindow.document.close();
   };
 
-  // Filter products based on selected category & search input
-  const filteredProducts = products.filter((p) => {
+  // 1. Get products matching category & search query
+  const categoryProducts = products.filter((p) => {
     const matchesCategory = activeCategory === "all" || p.category_id === activeCategory || (activeCategory === "promo" && p.promo_price);
     const name = locale === "pt" ? p.name_pt : p.name_es;
     const matchesSearch = !searchFilter.trim() || name.toLowerCase().includes(searchFilter.toLowerCase());
     return matchesCategory && matchesSearch;
+  });
+
+  // 2. Extract unique brands present in this subset of products for the "smart brand filter"
+  const availableBrands = Array.from(
+    new Set(categoryProducts.map((p) => p.brand || "").filter((b) => b !== ""))
+  );
+
+  // 3. Extract min and max prices from this subset to make price ranges/sliders dynamic
+  const productPrices = categoryProducts.map((p) => p.promo_price || p.price);
+  const maxAvailablePrice = productPrices.length > 0 ? Math.max(...productPrices) : 10000000;
+  const minAvailablePrice = productPrices.length > 0 ? Math.min(...productPrices) : 0;
+
+  // 4. Apply selected filters
+  let filteredProducts = categoryProducts.filter((p) => {
+    const activePrice = p.promo_price || p.price;
+    const matchesMaxPrice = !maxPrice || activePrice <= maxPrice;
+    const matchesBrand = selectedBrand === "all" || p.brand === selectedBrand;
+    const matchesInStock = !onlyInStock || p.stock > 0;
+    const matchesPromo = !onlyPromo || !!p.promo_price;
+    const matchesFreeShipping = !onlyFreeShipping || !!p.badges?.includes("free_shipping");
+
+    return matchesMaxPrice && matchesBrand && matchesInStock && matchesPromo && matchesFreeShipping;
+  });
+
+  // 5. Apply sorting
+  filteredProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = a.promo_price || a.price;
+    const priceB = b.promo_price || b.price;
+
+    if (sortBy === "price_asc") {
+      return priceA - priceB;
+    }
+    if (sortBy === "price_desc") {
+      return priceB - priceA;
+    }
+    if (sortBy === "popularity") {
+      return b.views_count - a.views_count;
+    }
+    if (sortBy === "newest") {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    return 0; // relevance / default order
   });
 
   const getCategoryIcon = (iconName: string) => {
@@ -509,16 +571,169 @@ function HomeContent() {
             <p className="text-base text-slate-500">
               {searchFilter ? `${filteredProducts.length} itens encontrados` : t("home.featured_subtitle")}
             </p>
-            <div className="flex justify-center pt-2">
+            <div className="flex justify-center gap-3 pt-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold shadow-md cursor-pointer transition-all hover:scale-105 ${
+                  showFilters 
+                    ? "bg-amber-500 text-slate-950" 
+                    : "bg-slate-900 text-white hover:bg-slate-800"
+                }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span>{locale === "pt" ? "Filtros Inteligentes" : "Filtros Inteligentes"}</span>
+              </button>
               <button
                 onClick={handleExportPDFCatalog}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-bold shadow-md cursor-pointer transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full text-xs font-bold shadow-sm border border-slate-200 cursor-pointer transition-all hover:scale-105"
               >
                 <FileText className="w-4 h-4 text-accent-amber" />
-                <span>{locale === "pt" ? "Baixar Catálogo em PDF" : "Descargar Catálogo en PDF"}</span>
+                <span>{locale === "pt" ? "Baixar Catálogo PDF" : "Descargar Catálogo PDF"}</span>
               </button>
             </div>
           </div>
+
+          {/* Smart Filters Panel */}
+          {showFilters && (
+            <div className="bg-slate-50 rounded-2xl border-2 border-slate-950 p-6 shadow-[4px_4px_0px_rgba(0,0,0,1)] animate-fade-in space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-xs text-slate-800">
+                {/* 1. Price Range */}
+                <div className="space-y-2">
+                  <h4 className="font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <span>💰</span> {locale === "pt" ? "Preço Máximo" : "Precio Máximo"}
+                  </h4>
+                  <div className="space-y-3">
+                    <input
+                      type="range"
+                      min={minAvailablePrice}
+                      max={maxAvailablePrice}
+                      step={50000}
+                      value={maxPrice || maxAvailablePrice}
+                      onChange={(e) => setMaxPrice(Number(e.target.value))}
+                      className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-950"
+                    />
+                    <div className="flex justify-between font-mono font-bold text-[11px] text-slate-500">
+                      <span>{formatCurrency(minAvailablePrice)}</span>
+                      <span className="text-slate-900 bg-amber-200 px-1.5 py-0.5 rounded">
+                        {formatCurrency(maxPrice || maxAvailablePrice)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Brand (Smart) */}
+                <div className="space-y-2">
+                  <h4 className="font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <span>🏷️</span> {locale === "pt" ? "Marca" : "Marca"}
+                  </h4>
+                  {availableBrands.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        onClick={() => setSelectedBrand("all")}
+                        className={`px-2.5 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${
+                          selectedBrand === "all"
+                            ? "bg-slate-950 text-white border-slate-950"
+                            : "bg-white text-slate-650 border-slate-200 hover:border-slate-350"
+                        }`}
+                      >
+                        {locale === "pt" ? "Todas" : "Todas"}
+                      </button>
+                      {availableBrands.map((brand) => (
+                        <button
+                          key={brand}
+                          onClick={() => setSelectedBrand(brand)}
+                          className={`px-2.5 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${
+                            selectedBrand === brand
+                              ? "bg-slate-950 text-white border-slate-950"
+                              : "bg-white text-slate-650 border-slate-200 hover:border-slate-350"
+                          }`}
+                        >
+                          {brand}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-slate-400 italic font-medium">
+                      {locale === "pt" ? "Marcas indisponíveis" : "Marcas no disponibles"}
+                    </p>
+                  )}
+                </div>
+
+                {/* 3. Availability and Badges */}
+                <div className="space-y-2">
+                  <h4 className="font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <span>⚡</span> {locale === "pt" ? "Status e Envio" : "Status y Envío"}
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-[11px] text-slate-700 hover:text-slate-900">
+                      <input
+                        type="checkbox"
+                        checked={onlyInStock}
+                        onChange={(e) => setOnlyInStock(e.target.checked)}
+                        className="w-4 h-4 text-slate-900 accent-slate-950 border-2 border-slate-950 rounded focus:ring-0 cursor-pointer"
+                      />
+                      <span>{locale === "pt" ? "Apenas em estoque" : "Solo en stock"}</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-[11px] text-slate-700 hover:text-slate-900">
+                      <input
+                        type="checkbox"
+                        checked={onlyPromo}
+                        onChange={(e) => setOnlyPromo(e.target.checked)}
+                        className="w-4 h-4 text-slate-900 accent-slate-950 border-2 border-slate-950 rounded focus:ring-0 cursor-pointer"
+                      />
+                      <span>{locale === "pt" ? "Apenas promoções" : "Solo ofertas"}</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-[11px] text-slate-700 hover:text-slate-900">
+                      <input
+                        type="checkbox"
+                        checked={onlyFreeShipping}
+                        onChange={(e) => setOnlyFreeShipping(e.target.checked)}
+                        className="w-4 h-4 text-slate-900 accent-slate-950 border-2 border-slate-950 rounded focus:ring-0 cursor-pointer"
+                      />
+                      <span>{locale === "pt" ? "Frete Grátis" : "Envío Gratis"}</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* 4. Sorting */}
+                <div className="space-y-2">
+                  <h4 className="font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    <span>{locale === "pt" ? "Ordenar por" : "Ordenar por"}</span>
+                  </h4>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-slate-950 rounded focus:outline-none focus:border-accent-amber bg-white font-bold cursor-pointer"
+                  >
+                    <option value="relevance">{locale === "pt" ? "Relevância (Padrão)" : "Relevancia (Predet.)"}</option>
+                    <option value="price_asc">{locale === "pt" ? "Preço: Menor para Maior" : "Precio: Menor a Mayor"}</option>
+                    <option value="price_desc">{locale === "pt" ? "Preço: Maior para Menor" : "Precio: Mayor a Menor"}</option>
+                    <option value="popularity">{locale === "pt" ? "Mais Populares" : "Más Populares"}</option>
+                    <option value="newest">{locale === "pt" ? "Lançamentos" : "Lanzamientos"}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Reset Filters button */}
+              <div className="flex justify-end border-t border-slate-200 pt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedBrand("all");
+                    setSortBy("relevance");
+                    setOnlyInStock(false);
+                    setOnlyPromo(false);
+                    setOnlyFreeShipping(false);
+                    setMaxPrice(undefined);
+                  }}
+                  className="px-4 py-1.5 border-2 border-slate-950 hover:bg-slate-100 rounded text-[10px] font-extrabold uppercase transition-all cursor-pointer"
+                >
+                  {locale === "pt" ? "Limpar todos os filtros" : "Limpiar todos los filtros"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Catalog grid */}
           {filteredProducts.length === 0 ? (
