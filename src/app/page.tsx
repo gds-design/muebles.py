@@ -498,67 +498,6 @@ function HomeContent() {
         );
       })()}
 
-      {/* Promotions Banner Section */}
-      <section className="py-12 bg-slate-50 font-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Primary Promo Banner */}
-            <div className="relative rounded-2xl overflow-hidden glass-card shadow-premium p-8 sm:p-12 min-h-60 flex flex-col justify-between group border-slate-200/80">
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-950 to-slate-900/90" />
-              <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-10 group-hover:opacity-25 transition-opacity pointer-events-none flex items-center justify-center p-4">
-                <Armchair className="w-32 h-32 text-white stroke-[1.5]" />
-              </div>
-              <div className="relative z-10 space-y-3 max-w-sm">
-                <span className="text-xs bg-accent-amber/20 text-accent-amber px-2.5 py-1 rounded font-bold uppercase tracking-wider">Ergonomia</span>
-                <h3 className="text-xl sm:text-2xl font-bold text-white pt-1">
-                  {locale === "pt" ? "Linha Corporativa Premium" : "Línea Corporativa Premium"}
-                </h3>
-                <p className="text-sm text-slate-400">
-                  {locale === "pt" ? "Melhore o rendimento da sua equipe com cadeiras que cuidam da postura." : "Mejora el rendimiento de tu equipo con sillas que cuidan la postura."}
-                </p>
-              </div>
-              <div className="relative z-10 pt-6">
-                <Link
-                  href="#produtos"
-                  onClick={() => setActiveCategory("cat-1")}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-accent-amber hover:underline"
-                >
-                  <span>{locale === "pt" ? "Ver Cadeiras" : "Ver Sillas"}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Secondary Promo Banner */}
-            <div className="relative rounded-2xl overflow-hidden glass-card shadow-premium p-8 sm:p-12 min-h-60 flex flex-col justify-between group border-slate-200/80">
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800/90" />
-              <div className="absolute right-4 bottom-0 top-0 w-1/2 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none flex items-center justify-center p-4">
-                <Table className="w-32 h-32 text-white stroke-[1.5]" />
-              </div>
-              <div className="relative z-10 space-y-3 max-w-sm">
-                <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded font-bold uppercase tracking-wider">Montagem</span>
-                <h3 className="text-xl sm:text-2xl font-bold text-white pt-1">
-                  {locale === "pt" ? "Montagem Grátis Assunção" : "Montaje Gratis Asunción"}
-                </h3>
-                <p className="text-sm text-slate-400">
-                  {locale === "pt" ? "Nas compras de mesas e organizadores acima de 2.000.000 Gs." : "En compras de mesas y estanterías superiores a 2.000.000 Gs."}
-                </p>
-              </div>
-              <div className="relative z-10 pt-6">
-                <Link
-                  href="#produtos"
-                  onClick={() => setActiveCategory("cat-3")}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-accent-amber hover:underline"
-                >
-                  <span>{locale === "pt" ? "Ver Mesas" : "Ver Mesas"}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Products Grid */}
       <section id="produtos" className="py-16 sm:py-24 bg-white font-sans scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
