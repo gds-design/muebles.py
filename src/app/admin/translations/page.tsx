@@ -101,7 +101,7 @@ export default function AdminTranslations() {
                         <td className="px-5 py-4 font-mono text-[10px] text-slate-450 truncate max-w-56" title={key}>{key}</td>
                         <td className="px-5 py-4 space-y-1">
                           <div className="text-slate-800 font-semibold">🇧🇷 {entry.pt}</div>
-                          <div className="text-slate-400 text-[10px]">🇪🇸 {entry.es}</div>
+                          <div className="text-slate-400 text-[10px]">🇵🇾 {entry.es}</div>
                         </td>
                         <td className="px-5 py-4 text-center">
                           <button

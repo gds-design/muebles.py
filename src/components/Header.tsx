@@ -205,7 +205,7 @@ export const Header: React.FC = () => {
                 }`}
                 title="Español"
               >
-                🇪🇸
+                🇵🇾
               </button>
             </div>
 
