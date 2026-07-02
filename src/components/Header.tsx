@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
               className="flex items-center gap-1 hover:text-accent-amber transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-green-500" />
-              <span>+595 981 123456</span>
+              <span>+595 973 953874</span>
             </a>
           </div>
         </div>

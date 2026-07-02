@@ -432,9 +432,9 @@ const initialPromotions: Promotion[] = [
     title_pt: "Seu novo móvel sem complicação.",
     title_es: "Tu nuevo mueble sin complicaciones.",
     subtitle_pt: "Móveis e cadeiras para casa e escritório com uma experiência de compra simples e transparente.",
-    subtitle_es: "Muebles y sillas para el hogar y la oficina con uma experiencia de compra simple y transparente.",
-    image_url: "/hero-furniture.jpg",
-    image_url_es: "/hero-furniture.jpg",
+    subtitle_es: "Muebles y sillas para el hogar y la oficina con una experiencia de compra simple y transparente.",
+    image_url: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80",
+    image_url_es: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80",
     link_url: "#produtos",
     active: true
   },
@@ -445,8 +445,8 @@ const initialPromotions: Promotion[] = [
     title_es: "Línea Corporativa Ergonómica",
     subtitle_pt: "Até 25% OFF em cadeiras com certificação de postura",
     subtitle_es: "Hasta 25% OFF en sillas con certificación de postura",
-    image_url: "/banner-office.jpg",
-    image_url_es: "/banner-office.jpg",
+    image_url: "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80",
+    image_url_es: "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80",
     link_url: "/category/office-chairs",
     active: true
   },
@@ -457,8 +457,8 @@ const initialPromotions: Promotion[] = [
     title_es: "Montaje Gratis Asunción",
     subtitle_pt: "Para compras acima de 2.000.000 Gs.",
     subtitle_es: "Para compras superiores a 2.000.000 Gs.",
-    image_url: "/banner-delivery.jpg",
-    image_url_es: "/banner-delivery.jpg",
+    image_url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
+    image_url_es: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
     link_url: "#como-funciona",
     active: true
   }
@@ -469,7 +469,7 @@ const initialOrders: Order[] = [
     id: "order-1",
     order_number: 1024,
     customer_name: "Juan Manuel Benítez",
-    customer_phone: "+595 981 123456",
+    customer_phone: "+595 973 953874",
     customer_email: "juan.benitez@gmail.com",
     city: "Asunción",
     address: "Av. Mariscal López 3421, Barrio Recoleta",
@@ -635,7 +635,43 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
 
     if (savedPromotions) {
-      setPromotions(JSON.parse(savedPromotions));
+      let parsed = JSON.parse(savedPromotions);
+      let updated = false;
+      parsed = parsed.map((p: Promotion) => {
+        if (p.subtitle_es && p.subtitle_es.includes("con uma experiencia")) {
+          p.subtitle_es = p.subtitle_es.replace("con uma experiencia", "con una experiencia");
+          updated = true;
+        }
+        if (p.image_url === "/hero-furniture.jpg") {
+          p.image_url = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        if (p.image_url_es === "/hero-furniture.jpg") {
+          p.image_url_es = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        if (p.image_url === "/banner-office.jpg") {
+          p.image_url = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        if (p.image_url_es === "/banner-office.jpg") {
+          p.image_url_es = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        if (p.image_url === "/banner-delivery.jpg") {
+          p.image_url = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        if (p.image_url_es === "/banner-delivery.jpg") {
+          p.image_url_es = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
+          updated = true;
+        }
+        return p;
+      });
+      setPromotions(parsed);
+      if (updated) {
+        localStorage.setItem("muebles_promotions", JSON.stringify(parsed));
+      }
     } else {
       setPromotions(initialPromotions);
       localStorage.setItem("muebles_promotions", JSON.stringify(initialPromotions));

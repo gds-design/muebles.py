@@ -126,7 +126,7 @@ function HomeContent() {
               <div style="font-size: 12px; color: #475569; font-weight: 600; margin-top: 4px;">Catálogo Oficial de Produtos - Paraguai</div>
             </div>
             <div class="info">
-              <div>Contato WhatsApp: +595 981 123456</div>
+              <div>Contato WhatsApp: +595 973 953874</div>
               <div>Data: ${new Date().toLocaleDateString("pt-BR")}</div>
             </div>
           </div>
@@ -244,7 +244,7 @@ function HomeContent() {
         ? `Olá! Gostaria de fazer um pedido ou obter mais informações sobre o produto: ${name} (Valor: ${formatCurrency(p.promo_price || p.price)})`
         : `¡Hola! Me gustaría hacer un pedido u obtener más información sobre o producto: ${name} (Valor: ${formatCurrency(p.promo_price || p.price)})`
     );
-    window.open(`https://wa.me/595981123456?text=${text}`, "_blank");
+    window.open(`https://wa.me/595973953874?text=${text}`, "_blank");
   };
 
   const faqItems = [
@@ -336,7 +336,7 @@ function HomeContent() {
 
         return (
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 font-sans">
-            <div className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] bg-slate-900 shadow-premium-lg border border-slate-100/50 aspect-[16/9] md:aspect-[21/8] min-h-[220px] sm:min-h-[380px] group">
+            <div className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] bg-slate-900 shadow-premium-lg border border-slate-100/50 aspect-[16/9] md:aspect-[21/8] min-h-[280px] sm:min-h-[400px] lg:min-h-[440px] group">
               {displayPromos.map((promo, idx) => {
                 const isVisible = idx === activeSlide;
                 const heroTitle = locale === "pt" ? promo.title_pt : promo.title_es;
@@ -368,13 +368,13 @@ function HomeContent() {
                         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent" />
 
                         {/* Dynamic Text Content overlay */}
-                        <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-2xl text-left text-white z-20 space-y-4 sm:space-y-6">
+                        <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-xl text-left text-white z-20 space-y-3 sm:space-y-4">
                           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/35 text-[9px] sm:text-xs font-black tracking-wider uppercase text-amber-400 w-max animate-fade-in">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                             {locale === "pt" ? "Destaques em Oferta" : "Destacados en Oferta"}
                           </div>
 
-                          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase font-sans text-white">
+                          <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight uppercase font-sans text-white">
                             {heroTitle}
                           </h1>
 
@@ -393,7 +393,7 @@ function HomeContent() {
                               <ArrowRight className="w-4 h-4" />
                             </Link>
                             <a
-                              href="https://wa.me/595981123456"
+                              href="https://wa.me/595973953874"
                               target="_blank"
                               rel="noreferrer"
                               className="px-5 py-2.5 sm:px-8 sm:py-3.5 bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur text-white font-black text-[10px] sm:text-xs rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
@@ -1017,7 +1017,7 @@ function HomeContent() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="https://wa.me/595981123456"
+              href="https://wa.me/595973953874"
               target="_blank"
               rel="noreferrer"
               className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-md font-semibold text-sm border border-slate-700 transition-colors flex items-center justify-center gap-2"

@@ -248,7 +248,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         ? `Olá! Tenho interesse em adquirir o produto: ${name} (Quantidade: ${quantity}, Valor unitário: ${formatCurrency(activePrice)})`
         : `¡Hola! Tengo interés en adquirir el producto: ${name} (Cantidad: ${quantity}, Valor unitario: ${formatCurrency(activePrice)})`
     );
-    window.open(`https://wa.me/595981123456?text=${text}`, "_blank");
+    window.open(`https://wa.me/595973953874?text=${text}`, "_blank");
   };
 
   // Find related products in the same category
@@ -509,7 +509,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   ? "Este produto está temporariamente indisponível no estoque."
                   : "Este producto está temporalmente agotado."}
                 <a
-                  href={`https://wa.me/595981123456?text=Quero%20saber%20quando%20o%20produto%20${name}%20estara%20disponivel`}
+                  href={`https://wa.me/595973953874?text=Quero%20saber%20quando%20o%20produto%20${name}%20estara%20disponivel`}
                   target="_blank"
                   rel="noreferrer"
                   className="block mt-2 font-bold text-accent-amber hover:underline"
@@ -753,20 +753,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         )}
 
       </main>
-
-      {/* Floating Sticky WhatsApp button for quick purchase inquiry */}
-      <a
-        href="https://wa.me/595981123456"
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white shadow-xl hover:bg-green-600 transition-all scale-100 hover:scale-105 active:scale-95 z-40 group"
-        title="WhatsApp Direct Contact"
-      >
-        <MessageSquare className="w-6.5 h-6.5 fill-white" />
-        <span className="absolute right-full mr-3 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          {locale === "pt" ? "Precisa de ajuda?" : "¿Necesitas ayuda?"}
-        </span>
-      </a>
 
       {/* Video Player Modal */}
       <VideoModal

@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { DBProvider } from "@/context/DBContext";
 import { CartProvider } from "@/context/CartContext";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
               <div className="flex-1 flex flex-col">
                 {children}
               </div>
+              <WhatsAppButton />
             </CartProvider>
           </LanguageProvider>
         </DBProvider>

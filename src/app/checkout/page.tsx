@@ -165,7 +165,7 @@ function CheckoutContent() {
         : `Por favor, confirme la disponibilidad y el tiempo de entrega.`)
     );
 
-    return `https://wa.me/595981123456?text=${text}`;
+    return `https://wa.me/595973953874?text=${text}`;
   };
 
   const handleSubmit = (type: "site" | "whatsapp") => {
@@ -332,7 +332,7 @@ function CheckoutContent() {
                       required
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="Ex: +595 981 123456"
+                      placeholder="Ex: +595 973 953874"
                       className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:outline-none focus:border-accent-amber bg-slate-50/50"
                     />
                   </div>
