@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { ProductVideo } from "@/lib/videoUtils";
+import { supabase } from "@/lib/supabaseClient";
 
 export interface Category {
   id: string;
@@ -469,7 +470,7 @@ const initialOrders: Order[] = [
     id: "order-1",
     order_number: 1024,
     customer_name: "Juan Manuel Benítez",
-    customer_phone: "+595 973 953874",
+    customer_phone: "+595 973953874",
     customer_email: "juan.benitez@gmail.com",
     city: "Asunción",
     address: "Av. Mariscal López 3421, Barrio Recoleta",
@@ -527,191 +528,243 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
-    // Load from local storage or set seeds
-    const savedCategories = localStorage.getItem("muebles_categories");
-    const savedProducts = localStorage.getItem("muebles_products");
-    const savedOrders = localStorage.getItem("muebles_orders");
-    const savedPromotions = localStorage.getItem("muebles_promotions");
-    const savedCoupons = localStorage.getItem("muebles_coupons");
+    const loadDatabase = async () => {
+      // 1. Categories
+      try {
+        const { data: catData, error: catError } = await supabase.from("categories").select("*");
+        if (catError || !catData) throw catError || new Error("No data");
+        setCategories(catData);
+        localStorage.setItem("muebles_categories", JSON.stringify(catData));
+      } catch (err) {
+        console.warn("Supabase fetch failed for categories, falling back to local storage.", err);
+        const savedCategories = localStorage.getItem("muebles_categories");
+        if (savedCategories && JSON.parse(savedCategories).length > 0) {
+          setCategories(JSON.parse(savedCategories));
+        } else {
+          setCategories(initialCategories);
+          localStorage.setItem("muebles_categories", JSON.stringify(initialCategories));
+        }
+      }
 
-    if (savedProducts && JSON.parse(savedProducts).length > 0) {
-      const parsed = JSON.parse(savedProducts);
-      let migrated = false;
-      const updatedProducts = parsed.map((p: Product) => {
-        if (!p.videos) {
-          p.videos = [];
-          migrated = true;
-          if (p.id === "prod-1") {
-            p.videos = [
-              {
-                id: "vid-1-1",
-                url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                title: "Demonstração Cadeira Executive Pro",
-                is_main: true,
-                show_in_gallery: true
-              },
-              {
-                id: "vid-1-2",
-                url: "https://vimeo.com/76979871",
-                title: "Ergonomia no Trabalho - Guia Rápido",
-                is_main: false,
-                show_in_gallery: true
+      // 2. Products
+      try {
+        const { data: prodData, error: prodError } = await supabase.from("products").select("*");
+        if (prodError || !prodData) throw prodError || new Error("No data");
+        const parsedProducts = prodData.map((p: any) => ({
+          ...p,
+          videos: p.videos ? (typeof p.videos === "string" ? JSON.parse(p.videos) : p.videos) : [],
+          reviews: p.reviews ? (typeof p.reviews === "string" ? JSON.parse(p.reviews) : p.reviews) : [],
+          images: p.images ? (typeof p.images === "string" ? JSON.parse(p.images) : p.images) : [],
+          badges: p.badges ? (typeof p.badges === "string" ? JSON.parse(p.badges) : p.badges) : []
+        }));
+        setProducts(parsedProducts);
+        localStorage.setItem("muebles_products", JSON.stringify(parsedProducts));
+      } catch (err) {
+        console.warn("Supabase fetch failed for products, falling back to local storage.", err);
+        const savedProducts = localStorage.getItem("muebles_products");
+        if (savedProducts && JSON.parse(savedProducts).length > 0) {
+          const parsed = JSON.parse(savedProducts);
+          let migrated = false;
+          const updatedProducts = parsed.map((p: Product) => {
+            if (!p.videos) {
+              p.videos = [];
+              migrated = true;
+              if (p.id === "prod-1") {
+                p.videos = [
+                  {
+                    id: "vid-1-1",
+                    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                    title: "Demonstração Cadeira Executive Pro",
+                    is_main: true,
+                    show_in_gallery: true
+                  },
+                  {
+                    id: "vid-1-2",
+                    url: "https://vimeo.com/76979871",
+                    title: "Ergonomia no Trabalho - Guia Rápido",
+                    is_main: false,
+                    show_in_gallery: true
+                  }
+                ];
+              } else if (p.id === "prod-3") {
+                p.videos = [
+                  {
+                    id: "vid-3-1",
+                    url: "https://iframe.videodelivery.net/fcb4e3f1e967a50bd82cd6b9bf2294e1",
+                    title: "Apresentação Mesa Wood & Steel",
+                    is_main: true,
+                    show_in_gallery: true
+                  }
+                ];
               }
-            ];
-          } else if (p.id === "prod-3") {
-            p.videos = [
-              {
-                id: "vid-3-1",
-                url: "https://iframe.videodelivery.net/fcb4e3f1e967a50bd82cd6b9bf2294e1",
-                title: "Apresentação Mesa Wood & Steel",
-                is_main: true,
-                show_in_gallery: true
-              }
-            ];
+            }
+            return p;
+          });
+
+          if (migrated) {
+            setProducts(updatedProducts);
+            localStorage.setItem("muebles_products", JSON.stringify(updatedProducts));
+          } else {
+            setProducts(parsed);
           }
+        } else {
+          const seeded = initialProducts.map((p) => {
+            if (p.id === "prod-1") {
+              return {
+                ...p,
+                videos: [
+                  {
+                    id: "vid-1-1",
+                    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                    title: "Demonstração Cadeira Executive Pro",
+                    is_main: true,
+                    show_in_gallery: true
+                  },
+                  {
+                    id: "vid-1-2",
+                    url: "https://vimeo.com/76979871",
+                    title: "Ergonomia no Trabalho - Guia Rápido",
+                    is_main: false,
+                    show_in_gallery: true
+                  }
+                ]
+              };
+            } else if (p.id === "prod-3") {
+              return {
+                ...p,
+                videos: [
+                  {
+                    id: "vid-3-1",
+                    url: "https://iframe.videodelivery.net/fcb4e3f1e967a50bd82cd6b9bf2294e1",
+                    title: "Apresentação Mesa Wood & Steel",
+                    is_main: true,
+                    show_in_gallery: true
+                  }
+                ]
+              };
+            }
+            return { ...p, videos: [] };
+          });
+          setProducts(seeded);
+          localStorage.setItem("muebles_products", JSON.stringify(seeded));
         }
-        return p;
-      });
-
-      if (migrated) {
-        setTimeout(() => {
-          setProducts(updatedProducts);
-        }, 0);
-        localStorage.setItem("muebles_products", JSON.stringify(updatedProducts));
-      } else {
-        setTimeout(() => {
-          setProducts(parsed);
-        }, 0);
       }
-    } else {
-      const seeded = initialProducts.map((p) => {
-        if (p.id === "prod-1") {
-          return {
-            ...p,
-            videos: [
-              {
-                id: "vid-1-1",
-                url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                title: "Demonstração Cadeira Executive Pro",
-                is_main: true,
-                show_in_gallery: true
-              },
-              {
-                id: "vid-1-2",
-                url: "https://vimeo.com/76979871",
-                title: "Ergonomia no Trabalho - Guia Rápido",
-                is_main: false,
-                show_in_gallery: true
-              }
-            ]
-          };
-        } else if (p.id === "prod-3") {
-          return {
-            ...p,
-            videos: [
-              {
-                id: "vid-3-1",
-                url: "https://iframe.videodelivery.net/fcb4e3f1e967a50bd82cd6b9bf2294e1",
-                title: "Apresentação Mesa Wood & Steel",
-                is_main: true,
-                show_in_gallery: true
-              }
-            ]
-          };
-        }
-        return { ...p, videos: [] };
-      });
-      setTimeout(() => {
-        setProducts(seeded);
-      }, 0);
-      localStorage.setItem("muebles_products", JSON.stringify(seeded));
-    }
 
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
-    } else {
-      setOrders(initialOrders);
-      localStorage.setItem("muebles_orders", JSON.stringify(initialOrders));
-    }
-
-    if (savedPromotions) {
-      let parsed = JSON.parse(savedPromotions);
-      let updated = false;
-      parsed = parsed.map((p: Promotion) => {
-        if (p.subtitle_es && p.subtitle_es.includes("con uma experiencia")) {
-          p.subtitle_es = p.subtitle_es.replace("con uma experiencia", "con una experiencia");
-          updated = true;
+      // 3. Orders
+      try {
+        const { data: ordData, error: ordError } = await supabase.from("orders").select("*");
+        if (ordError || !ordData) throw ordError || new Error("No data");
+        const parsedOrders = ordData.map((o: any) => ({
+          ...o,
+          items: o.items ? (typeof o.items === "string" ? JSON.parse(o.items) : o.items) : []
+        }));
+        setOrders(parsedOrders);
+        localStorage.setItem("muebles_orders", JSON.stringify(parsedOrders));
+      } catch (err) {
+        console.warn("Supabase fetch failed for orders, falling back to local storage.", err);
+        const savedOrders = localStorage.getItem("muebles_orders");
+        if (savedOrders) {
+          setOrders(JSON.parse(savedOrders));
+        } else {
+          setOrders(initialOrders);
+          localStorage.setItem("muebles_orders", JSON.stringify(initialOrders));
         }
-        if (p.image_url === "/hero-furniture.jpg") {
-          p.image_url = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        if (p.image_url_es === "/hero-furniture.jpg") {
-          p.image_url_es = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        if (p.image_url === "/banner-office.jpg") {
-          p.image_url = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        if (p.image_url_es === "/banner-office.jpg") {
-          p.image_url_es = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        if (p.image_url === "/banner-delivery.jpg") {
-          p.image_url = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        if (p.image_url_es === "/banner-delivery.jpg") {
-          p.image_url_es = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
-          updated = true;
-        }
-        return p;
-      });
-      setPromotions(parsed);
-      if (updated) {
-        localStorage.setItem("muebles_promotions", JSON.stringify(parsed));
       }
-    } else {
-      setPromotions(initialPromotions);
-      localStorage.setItem("muebles_promotions", JSON.stringify(initialPromotions));
-    }
 
-    if (savedCoupons) {
-      setCoupons(JSON.parse(savedCoupons));
-    } else {
-      const initialCoupons: Coupon[] = [
-        { id: "c-1", code: "MUEBLES10", type: "percentage", value: 10, min_purchase: 0, active: true, usage_count: 5 },
-        { id: "c-2", code: "ALTO50", type: "fixed", value: 50000, min_purchase: 500000, active: true, usage_count: 2 },
-        { id: "c-3", code: "FRETEGRATIS", type: "percentage", value: 0, min_purchase: 0, active: true, usage_count: 12 }
-      ];
-      setCoupons(initialCoupons);
-      localStorage.setItem("muebles_coupons", JSON.stringify(initialCoupons));
-    }
+      // 4. Promotions
+      try {
+        const { data: promoData, error: promoError } = await supabase.from("promotions").select("*");
+        if (promoError || !promoData) throw promoError || new Error("No data");
+        setPromotions(promoData);
+        localStorage.setItem("muebles_promotions", JSON.stringify(promoData));
+      } catch (err) {
+        console.warn("Supabase fetch failed for promotions, falling back to local storage.", err);
+        const savedPromotions = localStorage.getItem("muebles_promotions");
+        if (savedPromotions) {
+          let parsed = JSON.parse(savedPromotions);
+          let updated = false;
+          parsed = parsed.map((p: Promotion) => {
+            if (p.subtitle_es && p.subtitle_es.includes("con uma experiencia")) {
+              p.subtitle_es = p.subtitle_es.replace("con uma experiencia", "con una experiencia");
+              updated = true;
+            }
+            if (p.image_url === "/hero-furniture.jpg") {
+              p.image_url = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            if (p.image_url_es === "/hero-furniture.jpg") {
+              p.image_url_es = "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            if (p.image_url === "/banner-office.jpg") {
+              p.image_url = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            if (p.image_url_es === "/banner-office.jpg") {
+              p.image_url_es = "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            if (p.image_url === "/banner-delivery.jpg") {
+              p.image_url = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            if (p.image_url_es === "/banner-delivery.jpg") {
+              p.image_url_es = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80";
+              updated = true;
+            }
+            return p;
+          });
+          setPromotions(parsed);
+          if (updated) {
+            localStorage.setItem("muebles_promotions", JSON.stringify(parsed));
+          }
+        } else {
+          setPromotions(initialPromotions);
+          localStorage.setItem("muebles_promotions", JSON.stringify(initialPromotions));
+        }
+      }
 
-    if (savedCategories && JSON.parse(savedCategories).length > 0) {
-      setTimeout(() => {
-        setCategories(JSON.parse(savedCategories));
-      }, 0);
-    } else {
-      setTimeout(() => {
-        setCategories(initialCategories);
-      }, 0);
-      localStorage.setItem("muebles_categories", JSON.stringify(initialCategories));
-    }
+      // 5. Coupons
+      try {
+        const { data: coupData, error: coupError } = await supabase.from("coupons").select("*");
+        if (coupError || !coupData) throw coupError || new Error("No data");
+        setCoupons(coupData);
+        localStorage.setItem("muebles_coupons", JSON.stringify(coupData));
+      } catch (err) {
+        console.warn("Supabase fetch failed for coupons, falling back to local storage.", err);
+        const savedCoupons = localStorage.getItem("muebles_coupons");
+        if (savedCoupons) {
+          setCoupons(JSON.parse(savedCoupons));
+        } else {
+          const initialCoupons: Coupon[] = [
+            { id: "c-1", code: "MUEBLES10", type: "percentage", value: 10, min_purchase: 0, active: true, usage_count: 5 },
+            { id: "c-2", code: "ALTO50", type: "fixed", value: 50000, min_purchase: 500000, active: true, usage_count: 2 },
+            { id: "c-3", code: "FRETEGRATIS", type: "percentage", value: 0, min_purchase: 0, active: true, usage_count: 12 }
+          ];
+          setCoupons(initialCoupons);
+          localStorage.setItem("muebles_coupons", JSON.stringify(initialCoupons));
+        }
+      }
+    };
+
+    loadDatabase();
   }, []);
 
   const addProduct = (p: Omit<Product, "id" | "views_count" | "created_at">) => {
+    const newProduct: Product = {
+      ...p,
+      id: "prod-" + Date.now(),
+      views_count: 0,
+      created_at: new Date().toISOString()
+    };
     setProducts((prev) => {
-      const newProduct: Product = {
-        ...p,
-        id: "prod-" + Date.now(),
-        views_count: 0,
-        created_at: new Date().toISOString()
-      };
       const updated = [newProduct, ...prev];
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
+    });
+
+    supabase.from("products").insert([newProduct]).then(({ error }) => {
+      if (error) console.error("Error syncing addProduct to Supabase:", error);
     });
   };
 
@@ -726,13 +779,18 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
     });
+
+    supabase.from("products").update(updatedFields).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing editProduct to Supabase:", error);
+    });
   };
 
   const duplicateProduct = (id: string) => {
+    let duplicated: Product | null = null;
     setProducts((prev) => {
       const original = prev.find((p) => p.id === id);
       if (!original) return prev;
-      const duplicated: Product = {
+      duplicated = {
         ...original,
         id: "prod-" + Date.now(),
         slug: `${original.slug}-copy-${Math.floor(Math.random() * 1000)}`,
@@ -745,6 +803,12 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
     });
+
+    if (duplicated) {
+      supabase.from("products").insert([duplicated]).then(({ error }) => {
+        if (error) console.error("Error syncing duplicateProduct to Supabase:", error);
+      });
+    }
   };
 
   const deleteProduct = (id: string) => {
@@ -753,26 +817,45 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
     });
+
+    supabase.from("products").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteProduct to Supabase:", error);
+    });
   };
 
   const incrementProductViews = (slug: string) => {
     setProducts((prev) => {
       if (prev.length === 0) return prev;
+      let targetId = "";
+      let newViews = 0;
       const updated = prev.map((p) => {
         if (p.slug === slug) {
-          return { ...p, views_count: p.views_count + 1 };
+          targetId = p.id;
+          newViews = p.views_count + 1;
+          return { ...p, views_count: newViews };
         }
         return p;
       });
       localStorage.setItem("muebles_products", JSON.stringify(updated));
+
+      if (targetId) {
+        supabase.from("products").update({ views_count: newViews }).eq("id", targetId).then(({ error }) => {
+          if (error) console.error("Error syncing incrementProductViews to Supabase:", error);
+        });
+      }
+
       return updated;
     });
   };
 
   const updateStock = (id: string, newStock: number, minStock?: number) => {
+    const updateFields: any = { stock: newStock };
     setProducts((prev) => {
       const updated = prev.map((p) => {
         if (p.id === id) {
+          if (minStock !== undefined) {
+            updateFields.min_stock = minStock;
+          }
           return {
             ...p,
             stock: newStock,
@@ -784,6 +867,10 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
     });
+
+    supabase.from("products").update(updateFields).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updateStock to Supabase:", error);
+    });
   };
 
   const createOrder = (orderFields: Omit<Order, "id" | "order_number" | "created_at">) => {
@@ -794,22 +881,33 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       order_number: nextNumber,
       created_at: new Date().toISOString()
     };
-    const updated = [newOrder, ...orders];
-    setOrders(updated);
-    localStorage.setItem("muebles_orders", JSON.stringify(updated));
+    
+    setOrders((prev) => {
+      const updated = [newOrder, ...prev];
+      localStorage.setItem("muebles_orders", JSON.stringify(updated));
+      return updated;
+    });
 
     // Deduct stock for items ordered
     const productsUpdated = products.map((p) => {
       const orderItem = newOrder.items.find((item) => item.product_id === p.id);
       if (orderItem) {
-        return { ...p, stock: Math.max(0, p.stock - orderItem.qty) };
+        const nextStock = Math.max(0, p.stock - orderItem.qty);
+        supabase.from("products").update({ stock: nextStock }).eq("id", p.id).then(({ error }) => {
+          if (error) console.error("Error updating stock in createOrder to Supabase:", error);
+        });
+        return { ...p, stock: nextStock };
       }
       return p;
     });
     setProducts(productsUpdated);
     localStorage.setItem("muebles_products", JSON.stringify(productsUpdated));
 
-    // If order used coupon, increment usage count of that coupon
+    // Sync order to Supabase
+    supabase.from("orders").insert([newOrder]).then(({ error }) => {
+      if (error) console.error("Error syncing createOrder to Supabase:", error);
+    });
+
     if (newOrder.coupon_code) {
       useCoupon(newOrder.coupon_code);
     }
@@ -818,28 +916,41 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const updateOrderStatus = (id: string, status: Order["status"]) => {
-    const updated = orders.map((o) => {
-      if (o.id === id) {
-        return { ...o, status };
-      }
-      return o;
+    setOrders((prev) => {
+      const updated = prev.map((o) => {
+        if (o.id === id) {
+          return { ...o, status };
+        }
+        return o;
+      });
+      localStorage.setItem("muebles_orders", JSON.stringify(updated));
+      return updated;
     });
-    setOrders(updated);
-    localStorage.setItem("muebles_orders", JSON.stringify(updated));
+
+    supabase.from("orders").update({ status }).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updateOrderStatus to Supabase:", error);
+    });
   };
 
   const updatePromotion = (id: string, updatedPromo: Partial<Promotion>) => {
-    const updated = promotions.map((pr) => {
-      if (pr.id === id) {
-        return { ...pr, ...updatedPromo };
-      }
-      return pr;
+    setPromotions((prev) => {
+      const updated = prev.map((pr) => {
+        if (pr.id === id) {
+          return { ...pr, ...updatedPromo };
+        }
+        return pr;
+      });
+      localStorage.setItem("muebles_promotions", JSON.stringify(updated));
+      return updated;
     });
-    setPromotions(updated);
-    localStorage.setItem("muebles_promotions", JSON.stringify(updated));
+
+    supabase.from("promotions").update(updatedPromo).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updatePromotion to Supabase:", error);
+    });
   };
 
   const addReview = (productId: string, name: string, rating: number, comment: string) => {
+    let updatedReviews: ProductReview[] = [];
     setProducts((prev) => {
       const updated = prev.map((p) => {
         if (p.id === productId) {
@@ -850,9 +961,10 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
             comment,
             date: new Date().toLocaleDateString("pt-BR")
           };
+          updatedReviews = [...currentReviews, newReview];
           return {
             ...p,
-            reviews: [...currentReviews, newReview]
+            reviews: updatedReviews
           };
         }
         return p;
@@ -860,6 +972,12 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_products", JSON.stringify(updated));
       return updated;
     });
+
+    if (updatedReviews.length > 0) {
+      supabase.from("products").update({ reviews: updatedReviews }).eq("id", productId).then(({ error }) => {
+        if (error) console.error("Error syncing addReview to Supabase:", error);
+      });
+    }
   };
 
   const addCoupon = (c: Omit<Coupon, "id" | "usage_count">) => {
@@ -868,21 +986,39 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       id: "coup-" + Date.now(),
       usage_count: 0
     };
-    const updated = [newCoupon, ...coupons];
-    setCoupons(updated);
-    localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+    setCoupons((prev) => {
+      const updated = [newCoupon, ...prev];
+      localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+      return updated;
+    });
+
+    supabase.from("coupons").insert([newCoupon]).then(({ error }) => {
+      if (error) console.error("Error syncing addCoupon to Supabase:", error);
+    });
   };
 
   const editCoupon = (id: string, updatedFields: Partial<Coupon>) => {
-    const updated = coupons.map((c) => (c.id === id ? { ...c, ...updatedFields } : c));
-    setCoupons(updated);
-    localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+    setCoupons((prev) => {
+      const updated = prev.map((c) => (c.id === id ? { ...c, ...updatedFields } : c));
+      localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+      return updated;
+    });
+
+    supabase.from("coupons").update(updatedFields).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing editCoupon to Supabase:", error);
+    });
   };
 
   const deleteCoupon = (id: string) => {
-    const updated = coupons.filter((c) => c.id !== id);
-    setCoupons(updated);
-    localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+    setCoupons((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+      return updated;
+    });
+
+    supabase.from("coupons").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteCoupon to Supabase:", error);
+    });
   };
 
   const useCoupon = (code: string): Coupon | null => {
@@ -892,22 +1028,37 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (c.expires_at && new Date(c.expires_at) < new Date()) return null;
     if (c.max_uses && c.usage_count >= c.max_uses) return null;
 
-    const updated = [...coupons];
-    updated[idx] = { ...c, usage_count: c.usage_count + 1 };
-    setCoupons(updated);
-    localStorage.setItem("muebles_coupons", JSON.stringify(updated));
-    return updated[idx];
+    const nextUsageCount = c.usage_count + 1;
+    setCoupons((prev) => {
+      const updated = [...prev];
+      const targetIdx = updated.findIndex((coupon) => coupon.id === c.id);
+      if (targetIdx !== -1) {
+        updated[targetIdx] = { ...c, usage_count: nextUsageCount };
+      }
+      localStorage.setItem("muebles_coupons", JSON.stringify(updated));
+      return updated;
+    });
+
+    supabase.from("coupons").update({ usage_count: nextUsageCount }).eq("id", c.id).then(({ error }) => {
+      if (error) console.error("Error syncing useCoupon to Supabase:", error);
+    });
+
+    return { ...c, usage_count: nextUsageCount };
   };
 
   const addCategory = (c: Omit<Category, "id">) => {
+    const newCategory: Category = {
+      ...c,
+      id: "cat-" + Date.now()
+    };
     setCategories((prev) => {
-      const newCategory: Category = {
-        ...c,
-        id: "cat-" + Date.now()
-      };
       const updated = [...prev, newCategory];
       localStorage.setItem("muebles_categories", JSON.stringify(updated));
       return updated;
+    });
+
+    supabase.from("categories").insert([newCategory]).then(({ error }) => {
+      if (error) console.error("Error syncing addCategory to Supabase:", error);
     });
   };
 
@@ -922,6 +1073,10 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       localStorage.setItem("muebles_categories", JSON.stringify(updated));
       return updated;
     });
+
+    supabase.from("categories").update(updatedFields).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing editCategory to Supabase:", error);
+    });
   };
 
   const deleteCategory = (id: string) => {
@@ -929,6 +1084,10 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       const updated = prev.filter((c) => c.id !== id);
       localStorage.setItem("muebles_categories", JSON.stringify(updated));
       return updated;
+    });
+
+    supabase.from("categories").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteCategory to Supabase:", error);
     });
   };
 

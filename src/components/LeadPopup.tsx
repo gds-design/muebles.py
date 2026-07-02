@@ -118,7 +118,7 @@ export const LeadPopup: React.FC = () => {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ex: +595 973 953874"
+                  placeholder="Ex: +595 973953874"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-slate-800 bg-slate-50/50 focus:outline-none focus:border-accent-amber"
                 />
               </div>

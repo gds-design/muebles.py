@@ -126,7 +126,7 @@ function HomeContent() {
               <div style="font-size: 12px; color: #475569; font-weight: 600; margin-top: 4px;">Catálogo Oficial de Produtos - Paraguai</div>
             </div>
             <div class="info">
-              <div>Contato WhatsApp: +595 973 953874</div>
+              <div>Contato WhatsApp: +595 973953874</div>
               <div>Data: ${new Date().toLocaleDateString("pt-BR")}</div>
             </div>
           </div>

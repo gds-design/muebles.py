@@ -75,7 +75,7 @@ export const Footer: React.FC = () => {
             <li className="flex items-center gap-2.5">
               <Phone className="w-4.5 h-4.5 text-slate-500 flex-shrink-0" />
               <a href="https://wa.me/595973953874" target="_blank" rel="noreferrer" className="hover:text-accent-amber transition-colors">
-                +595 973 953874
+                +595 973953874
               </a>
             </li>
             <li className="flex items-center gap-2.5">
@@ -144,6 +144,17 @@ export const Footer: React.FC = () => {
       <div className="bg-slate-950 py-6 border-t border-slate-850">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Muebles.py. Todos os direitos reservados.</p>
+          <p>
+            Desenvolvido por{" "}
+            <a
+              href="https://gdsdesign.site/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-accent-amber hover:underline font-semibold transition-colors"
+            >
+              GDS Design
+            </a>
+          </p>
           
         </div>
       </div>
