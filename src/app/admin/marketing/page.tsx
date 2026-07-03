@@ -48,6 +48,7 @@ export default function MarketingCenter() {
   }, [locale]);
 
   const [selectedProductId, setSelectedProductId] = useState("");
+  const [copyLanguage, setCopyLanguage] = useState<"pt" | "es">("pt");
   const [templateType, setTemplateType] = useState<"promo" | "flash" | "launch" | "destaque">("promo");
   
   // New dimension & layout states
@@ -945,8 +946,8 @@ export default function MarketingCenter() {
 
   const handleGenerateAICopy = () => {
     if (!activeProduct) return;
-    const name = activeProduct.name_pt;
-    const desc = activeProduct.description_pt;
+    const name = copyLanguage === "es" ? (activeProduct.name_es || activeProduct.name_pt) : activeProduct.name_pt;
+    const desc = copyLanguage === "es" ? (activeProduct.description_es || activeProduct.description_pt) : activeProduct.description_pt;
     const price = activeProduct.promo_price || activeProduct.price;
     const formattedPrice = new Intl.NumberFormat("es-PY", {
       style: "currency",
@@ -954,13 +955,23 @@ export default function MarketingCenter() {
       minimumFractionDigits: 0
     }).format(price).replace("PYG", "Gs.");
 
-    setAiOutputs({
-      caption: `🔥 NOVIDADE NO PARAGUAI! Conheça a ${name}.\n\nSeu ambiente de trabalho ou home office nunca mais será o mesmo. Desenvolvida com ergonomia de alta performance, ela une conforto premium, durabilidade extrema e design minimalista sofisticado.\n\n💥 Preço promocional por tempo limitado: de ${new Intl.NumberFormat("es-PY", {style:"currency",currency:"PYG",minimumFractionDigits:0}).format(activeProduct.price).replace("PYG","Gs.")} por apenas ${formattedPrice}!\n\n🚛 Entregamos e montamos em diversas regiões do Paraguai.\n👉 Clique no link da bio ou chame direto no WhatsApp +595 973953874 para garantir a sua!`,
-      whatsapp: `*Móveis Premium Muebles.py* 🚚\n\n*${name}* - Ergonômica de Alto Padrão!\n\n${desc}\n\n💵 *Oferta:* por apenas *${formattedPrice}*!\n\n✅ Garantia estrutural\n✅ Pronta entrega e montagem rápida\n\nFale conosco pelo link e reserve a sua:\nhttps://wa.me/595973953874`,
-      adText: `Sua coluna dói após horas de trabalho? Transforme sua rotina com a ${name}. Conforto ergonômico premium e suporte integral. Parcele direto ou compre com desconto no pix. Compre online e receba com segurança!`,
-      textTag: `@mueblespy`,
-      hashtags: `#mueblespy #cadeiramergonomicas #homeofficeparaguay #moveisassuncao #sillasparaguay #decoracionpy #escritoriopy`
-    });
+    if (copyLanguage === "es") {
+      setAiOutputs({
+        caption: `🔥 ¡NOVEDAD EN PARAGUAY! Conocé la ${name}.\n\nTu espacio de trabajo o home office nunca más será el mismo. Desarrollada con ergonomía de alta performance, une confort premium, durabilidad extrema y diseño minimalista sofisticado.\n\n💥 ¡Precio promocional por tempo limitado: de ${new Intl.NumberFormat("es-PY", {style:"currency",currency:"PYG",minimumFractionDigits:0}).format(activeProduct.price).replace("PYG","Gs.")} por tan solo ${formattedPrice}!\n\n🚛 Entregamos y montamos en varias zonas de Paraguay.\n👉 ¡Hacé clic en el enlace de la bio o escribinos directo al WhatsApp +595 973953874 para asegurar la tuya!`,
+        whatsapp: `*Muebles Premium Muebles.py* 🚚\n\n*${name}* - ¡Ergonómica de Alto Nivel!\n\n${desc}\n\n💵 *Oferta:* ¡por solo *${formattedPrice}*!\n\n✅ Garantía estructural\n✅ Pronta entrega y montaje rápido\n\nContactanos en el enlace para reservar la tuya:\nhttps://wa.me/595973953874`,
+        adText: `¿Te duele la espalda después de horas de trabajo? Transformá tu rutina con la ${name}. Confort ergonómico premium y soporte total. Comprá online y recibí con seguridad. ¡Hacemos envíos y montaje!`,
+        textTag: `@mueblespy`,
+        hashtags: `#mueblespy #sillasergonomicas #homeofficeparaguay #sillasparaguay #decoracionpy #escritoriopy #asuncion #ciudaddeleste`
+      });
+    } else {
+      setAiOutputs({
+        caption: `🔥 NOVIDADE NO PARAGUAI! Conheça a ${name}.\n\nSeu ambiente de trabalho ou home office nunca mais será o mesmo. Desenvolvida com ergonomia de alta performance, ela une conforto premium, durabilidade extrema e design minimalista sofisticado.\n\n💥 Preço promocional por tempo limitado: de ${new Intl.NumberFormat("es-PY", {style:"currency",currency:"PYG",minimumFractionDigits:0}).format(activeProduct.price).replace("PYG","Gs.")} por apenas ${formattedPrice}!\n\n🚛 Entregamos e montamos em diversas regiões do Paraguai.\n👉 Clique no link da bio ou chame direto no WhatsApp +595 973953874 para garantir a sua!`,
+        whatsapp: `*Móveis Premium Muebles.py* 🚚\n\n*${name}* - Ergonômica de Alto Padrão!\n\n${desc}\n\n💵 *Oferta:* por apenas *${formattedPrice}*!\n\n✅ Garantia estrutural\n✅ Pronta entrega e montagem rápida\n\nFale conosco pelo link e reserve a sua:\nhttps://wa.me/595973953874`,
+        adText: `Sua coluna dói após horas de trabalho? Transforme sua rotina com a ${name}. Conforto ergonômico premium e suporte integral. Parcele direto ou compre com desconto no pix. Compre online e receba com segurança!`,
+        textTag: `@mueblespy`,
+        hashtags: `#mueblespy #cadeiramergonomicas #homeofficeparaguay #moveisassuncao #sillasparaguay #decoracionpy #escritoriopy`
+      });
+    }
   };
 
   // Coupons Manager handlers
@@ -1491,17 +1502,31 @@ export default function MarketingCenter() {
           </div>
 
           <div className="space-y-4">
-            <div className="w-full max-w-sm text-xs space-y-1.5 font-bold">
-              <label className="font-bold text-slate-500 uppercase">Selecionar Produto de Referência</label>
-              <select
-                value={selectedProductId}
-                onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 transition-colors"
-              >
-                {products.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name_pt}</option>
-                ))}
-              </select>
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <div className="w-full max-w-sm text-xs space-y-1.5 font-bold">
+                <label className="font-bold text-slate-500 uppercase">Selecionar Produto de Referência</label>
+                <select
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 transition-colors"
+                >
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>{locale === "pt" ? p.name_pt : p.name_es}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="w-full max-w-xs text-xs space-y-1.5 font-bold">
+                <label className="font-bold text-slate-500 uppercase">Idioma de Geração</label>
+                <select
+                  value={copyLanguage}
+                  onChange={(e) => setCopyLanguage(e.target.value as "pt" | "es")}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:border-amber-500 transition-colors"
+                >
+                  <option value="pt">🇧🇷 Português (Brasil)</option>
+                  <option value="es">🇵🇾 Español (Paraguay)</option>
+                </select>
+              </div>
             </div>
 
             {aiOutputs ? (
