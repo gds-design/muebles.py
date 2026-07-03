@@ -99,11 +99,11 @@ export const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2.5 flex-shrink-0 group">
-            <span className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white tracking-tighter text-lg shadow-md group-hover:bg-accent-amber transition-colors duration-300">
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0 group">
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white tracking-tighter text-base sm:text-lg shadow-md group-hover:bg-accent-amber transition-colors duration-300">
               M
             </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900 uppercase">
+            <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 uppercase">
               Muebles<span className="text-accent-amber font-extrabold font-mono">.py</span>
             </span>
           </Link>
@@ -182,12 +182,12 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Actions: Lang, Cart, Menu */}
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center space-x-2 sm:space-x-3.5">
             {/* Language Switcher */}
-            <div className="flex items-center border border-slate-200 rounded-full px-2 py-1 bg-slate-50 text-[11px] font-bold space-x-1.5 shadow-sm">
+            <div className="flex items-center border border-slate-200 rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 bg-slate-50 text-[11px] font-bold space-x-1 sm:space-x-1.5 shadow-sm">
               <button
                 onClick={() => setLocale("pt")}
-                className={`w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all ${
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full flex items-center justify-center transition-all ${
                   locale === "pt"
                     ? "bg-slate-900 text-white scale-110 shadow-sm"
                     : "text-slate-400 hover:text-slate-700 hover:scale-105"
@@ -198,7 +198,7 @@ export const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => setLocale("es")}
-                className={`w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all ${
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full flex items-center justify-center transition-all ${
                   locale === "es"
                     ? "bg-slate-900 text-white scale-110 shadow-sm"
                     : "text-slate-400 hover:text-slate-700 hover:scale-105"
@@ -212,11 +212,11 @@ export const Header: React.FC = () => {
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2.5 text-slate-700 hover:text-accent-amber transition-colors rounded-full hover:bg-slate-50 border border-transparent hover:border-slate-100 shadow-sm bg-white"
+              className="relative p-2 sm:p-2.5 text-slate-700 hover:text-accent-amber transition-colors rounded-full hover:bg-slate-50 border border-transparent hover:border-slate-100 shadow-sm bg-white"
             >
-              <ShoppingCart className="w-5.5 h-5.5" />
+              <ShoppingCart className="w-5 sm:w-5.5 sm:h-5.5 h-5" />
               {cartItemsCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900 text-[10px] text-white flex items-center justify-center font-bold font-mono shadow-md animate-pulse-slow">
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-slate-900 text-[9px] text-white flex items-center justify-center font-bold font-mono shadow-md animate-pulse-slow">
                   {cartItemsCount}
                 </span>
               )}
@@ -225,9 +225,9 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 text-slate-700 hover:text-accent-amber transition-colors rounded-full bg-slate-50 hover:bg-slate-100"
+              className="lg:hidden p-2 sm:p-2.5 text-slate-700 hover:text-accent-amber transition-colors rounded-full bg-slate-50 hover:bg-slate-100"
             >
-              {isMobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
+              {isMobileMenuOpen ? <X className="w-5 sm:w-5.5 sm:h-5.5 h-5" /> : <Menu className="w-5 sm:w-5.5 sm:h-5.5 h-5" />}
             </button>
           </div>
         </div>
