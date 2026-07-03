@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "@/context/LanguageContext";
 import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export const WhatsAppButton: React.FC = () => {
   const { locale } = useTranslation();
+  const pathname = usePathname();
   const [showBubble, setShowBubble] = useState(false);
   const [hasClosed, setHasClosed] = useState(false);
 
@@ -48,6 +50,10 @@ export const WhatsAppButton: React.FC = () => {
 
   const tooltipText =
     locale === "pt" ? "Falar no WhatsApp" : "Hablar por WhatsApp";
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
